@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我的東京旅行</title>
+    <style>
+        /* --- 基礎設定 --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f2f2f7;
+            margin: 0;
+            padding: 0;
+            padding-bottom: 80px; /* 為了不被底部選單擋住 */
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* --- 頂部標題 --- */
+        .top-nav {
+            background: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+        }
+
+        /* --- 頁面內容區塊 (預設隱藏) --- */
+        .page-content {
+            display: none;
+            padding: 20px;
+            animation: fadeIn 0.3s;
+        }
+        .page-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- 卡片樣式 --- */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        h2 { margin-top: 0; font-size: 18px; color: #333; }
+
+        /* --- 1. 行程表樣式 --- */
+        .timeline-item {
+            display: flex;
+            margin-bottom: 15px;
+            border-left: 2px solid #007aff;
+            padding-left: 15px;
+        }
+        .time { font-weight: bold; color: #007aff; min-width: 50px; }
+        .detail { color: #555; }
+
+        /* --- 2. 購物清單樣式 --- */
+        .check-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .check-item input { margin-right: 10px; transform: scale(1.3); }
+
+        /* --- 3. 景點樣式 --- */
+        .spot-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background-color: #ddd;
+        }
+
+        /* --- 4. 記帳樣式 --- */
+        .input-group { display: flex; gap: 10px; margin-bottom: 10px; }
+        input[type="text"], input[type="number"] {
+            flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px;
+        }
+        button.add-btn {
+            background: #007aff; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;
+        }
+        .expense-list { list-style: none; padding: 0; }
+        .expense-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #ccc; }
+        .total-box { font-size: 20px; font-weight: bold; text-align: right; color: #ff3b30; margin-top: 10px; }
+
+        /* --- 底部導覽列 --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0 25px 0; /* 適配 iPhone 底部橫條 */
+            border-top: 1px solid #eee;
+        }
+        .nav-item {
+            text-align: center;
+            font-size: 10px;
+            color: #999;
+            cursor: pointer;
+            width: 25%;
+        }
+        .nav-item.active { color: #007aff; }
+        .nav-icon { font-size: 24px; display: block; margin-bottom: 2px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="top-nav" id="page-title">東京行 Day 1</div>
+
+    <div id="tab-1" class="page-content active">
+        <div class="card">
+            <h2>✈️ 航班資訊</h2>
+            <p><strong>HKG ➔ NRT (CX504)</strong></p>
+            <p>09:05 出發 | 14:30 抵達</p>
+        </div>
+
+        <div class="card">
+            <h2>📅 今日行程</h2>
+            <div class="timeline-item">
+                <div class="time">15:00</div>
+                <div class="detail">搭乘 NEX 前往新宿</div>
+            </div>
+            <div class="timeline-item">
+                <div class="time">16:30</div>
+                <div class="detail">飯店 Check-in (哥吉拉飯店)</div>
+            </div>
+            <div class="timeline-item">
+                <div class="time">18:00</div>
+                <div class="detail">歌舞伎町晚餐 (燒肉)</div>
+            </div>
+            <div class="timeline-item">
+                <div class="time">20:00</div>
+                <div class="detail">唐吉訶德購物</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-2" class="page-content">
+        <div class="card">
+            <h2>💊 藥妝店</h2>
+            <div class="check-item"><input type="checkbox"> EVE 止痛藥 (藍色)</div>
+            <div class="check-item"><input type="checkbox"> 合利他命 EX</div>
+            <div class="check-item"><input type="checkbox"> 蒸氣眼罩</div>
+        </div>
+        <div class="card">
+            <h2>🍪 伴手禮</h2>
+            <div class="check-item"><input type="checkbox"> NewYrok Perfect Cheese</div>
+            <div class="check-item"><input type="checkbox"> Press Butter Sand</div>
+        </div>
+    </div>
+
+    <div id="tab-3" class="page-content">
+        <div class="card spot-card">
+            <img src="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=600&q=80" alt="Tokyo">
+            <h2>東京鐵塔</h2>
+            <p>建議黃昏時段去，可以拍到日落。</p>
+            <a href="https://goo.gl/maps/example" style="color:#007aff; text-decoration:none;">📍 開啟 Google Maps</a>
+        </div>
+        <div class="card spot-card">
+            <img src="https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?auto=format&fit=crop&w=600&q=80" alt="Fuji">
+            <h2>河口湖</h2>
+            <p>如果天氣好一定要去拍逆富士！</p>
+        </div>
+    </div>
+
+    <div id="tab-4" class="page-content">
+        <div class="card">
+            <h2>💰 新增消費</h2>
+            <div class="input-group">
+                <input type="text" id="expense-name" placeholder="項目 (如: 拉麵)">
+                <input type="number" id="expense-amount" placeholder="金額 (日圓)">
+            </div>
+            <button class="add-btn" onclick="addExpense()" style="width:100%">記一筆</button>
+        </div>
+
+        <div class="card">
+            <h2>消費紀錄</h2>
+            <ul class="expense-list" id="expense-list">
+                </ul>
+            <div class="total-box">總計: ¥<span id="total-amount">0</span></div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab(1, '行程')">
+            <span class="nav-icon">📅</span> 行程
+        </div>
+        <div class="nav-item" onclick="switchTab(2, '購物')">
+            <span class="nav-icon">🛍️</span> 購物
+        </div>
+        <div class="nav-item" onclick="switchTab(3, '景點')">
+            <span class="nav-icon">🗻</span> 景點
+        </div>
+        <div class="nav-item" onclick="switchTab(4, '記帳')">
+            <span class="nav-icon">💰</span> 記帳
+        </div>
+    </div>
+
+    <script>
+        // 切換頁面功能
+        function switchTab(tabIndex, titleName) {
+            // 隱藏所有頁面
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.remove('active');
+            });
+            // 移除所有按鈕的 active 狀態
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // 顯示選中的頁面
+            document.getElementById('tab-' + tabIndex).classList.add('active');
+            // 設定標題
+            document.getElementById('page-title').innerText = titleName;
+            // 設定按鈕顏色
+            document.querySelectorAll('.nav-item')[tabIndex - 1].classList.add('active');
+        }
+
+        // 簡單記帳功能 (注意：重新整理網頁後資料會消失，適合截圖用)
+        let total = 0;
+        function addExpense() {
+            const nameInput = document.getElementById('expense-name');
+            const amountInput = document.getElementById('expense-amount');
+            const name = nameInput.value;
+            const amount = parseInt(amountInput.value);
+
+            if (name && amount) {
+                const list = document.getElementById('expense-list');
+                const li = document.createElement('li');
+                li.className = 'expense-item';
+                li.innerHTML = `<span>${name}</span> <span>¥${amount}</span>`;
+                list.appendChild(li);
+
+                total += amount;
+                document.getElementById('total-amount').innerText = total;
+
+                // 清空輸入框
+                nameInput.value = '';
+                amountInput.value = '';
+            } else {
+                alert('請輸入項目和金額');
+            }
+        }
+    </script>
+</body>
+</html>
