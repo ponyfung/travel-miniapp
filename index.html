@@ -2,335 +2,561 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>我的旅行 App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>eMenu Tokyo</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
-        /* --- iOS 風格設計 --- */
         :root {
-            --primary-color: #007aff;
-            --bg-color: #f2f2f7;
-            --card-bg: #ffffff;
-            --text-main: #000000;
-            --text-sub: #8e8e93;
-            --gradient-blue: linear-gradient(135deg, #007aff 0%, #5ac8fa 100%);
+            --ios-blue: #007aff;
+            --frosted-bg: rgba(255, 255, 255, 0.65);
+            --frosted-blur: saturate(180%) blur(20px);
+            --card-radius: 20px;
+            --text-dark: #1c1c1e;
+            --text-gray: #8e8e93;
+            --bg-image-default: url('https://images.unsplash.com/photo-1552560229-f2125c064664?q=80&w=1000&auto=format&fit=crop');
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 0;
-            padding-bottom: 90px;
+            /* 背景圖設置 */
+            background-image: var(--bg-image, var(--bg-image-default));
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-dark);
+            height: 100vh;
+            padding-bottom: 90px; /* 預留底部導覽列空間 */
+            box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            color: var(--text-main);
         }
 
-        /* 頂部 Header */
-        .header {
-            background: var(--gradient-blue);
-            color: white;
-            padding: 40px 20px 20px 20px;
-            border-bottom-left-radius: 24px;
-            border-bottom-right-radius: 24px;
-            box-shadow: 0 4px 12px rgba(0,122,255,0.3);
-            margin-bottom: 20px;
+        /* --- 通用磨砂卡片樣式 --- */
+        .frosted-card {
+            background: var(--frosted-bg);
+            -webkit-backdrop-filter: var(--frosted-blur);
+            backdrop-filter: var(--frosted-blur);
+            border-radius: var(--card-radius);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
-        .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
-        .header p { margin: 5px 0 0; opacity: 0.9; font-size: 14px; }
 
-        /* 卡片容器 */
-        .container { padding: 0 16px; }
+        /* --- 頂部 Header 區域 --- */
+        .header-container {
+            padding: 20px 20px 0 20px;
+            padding-top: env(safe-area-inset-top, 20px); /* 避開動態島/瀏海 */
+        }
         
-        .card {
-            background: var(--card-bg);
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;
+        }
+        .app-title { 
+            font-size: 24px; font-weight: 800; display: flex; align-items: center; 
+            cursor: pointer; /* 點擊標題換背景 */
+        }
+        .currency-info { font-size: 12px; color: var(--text-gray); text-align: right; font-weight: 500; }
+
+        /* --- 日子選擇器 (橫向捲動) --- */
+        .day-navigator {
+            display: flex;
+            overflow-x: auto;
+            gap: 10px;
+            padding-bottom: 10px;
+            scrollbar-width: none; /* 隱藏捲軸 Firefox */
+        }
+        .day-navigator::-webkit-scrollbar { display: none; /* 隱藏捲軸 Chrome/Safari */ }
+        
+        .day-item {
+            min-width: 70px; height: 75px;
+            background: rgba(255, 255, 255, 0.5);
+            -webkit-backdrop-filter: var(--frosted-blur);
+            backdrop-filter: var(--frosted-blur);
             border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-
-        h2 { font-size: 18px; margin: 0 0 12px 0; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
-
-        /* --- 輸入框樣式 --- */
-        .input-row {
-            display: flex; gap: 10px; margin-bottom: 15px;
-        }
-        input[type="text"], input[type="time"] {
-            background: #f2f2f7; border: none; padding: 10px 12px;
-            border-radius: 10px; flex: 1; font-size: 16px;
-        }
-        .add-btn {
-            background: var(--primary-color); color: white; border: none;
-            width: 40px; border-radius: 10px; font-size: 20px; display: flex;
-            align-items: center; justify-content: center; cursor: pointer;
-        }
-
-        /* --- 列表樣式 --- */
-        .list-item {
-            display: flex; align-items: center; padding: 12px 0;
-            border-bottom: 1px solid #f2f2f7; transition: all 0.2s;
-        }
-        .list-item:last-child { border-bottom: none; }
-        
-        /* 打勾後的樣式 */
-        .list-item.completed span {
-            text-decoration: line-through; color: var(--text-sub);
-        }
-        .checkbox {
-            width: 22px; height: 22px; border-radius: 50%; border: 2px solid #c7c7cc;
-            margin-right: 12px; display: flex; align-items: center; justify-content: center;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
             transition: all 0.2s;
         }
-        .list-item.completed .checkbox {
-            background: var(--primary-color); border-color: var(--primary-color);
+        .day-item.active {
+            background: #5e87bb; /* 選中時的深藍色 */
+            color: white;
         }
-        .list-item.completed .checkbox::after {
-            content: '✓'; color: white; font-size: 14px;
+        .day-label { font-size: 12px; opacity: 0.8; margin-bottom: 4px;}
+        .day-date { font-size: 24px; font-weight: 700; }
+
+        /* --- 主要內容區 --- */
+        .main-content {
+            padding: 0 20px;
+            opacity: 1; transition: opacity 0.3s;
         }
-        .delete-btn {
-            color: #ff3b30; font-size: 12px; margin-left: auto; padding: 5px;
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin: 25px 0 15px 0;
+        }
+        .section-title { font-size: 20px; font-weight: 700; }
+        .add-btn {
+            background: rgba(255,255,255,0.3); backdrop-filter: blur(10px);
+            padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600;
         }
 
-        /* --- 行程表樣式 --- */
-        .timeline-item {
-            display: flex; margin-bottom: 15px; position: relative;
+        /* --- 航班卡片 (特殊樣式) --- */
+        .flight-card {
+            /* 模仿圖片的藍色漸層 */
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: linear-gradient(135deg, #5a81ce 0%, #3a61b0 100%);
+            color: white; padding: 20px; position: relative;
+            margin-bottom: 20px;
         }
-        .timeline-time {
-            font-weight: 600; color: var(--primary-color); width: 50px; flex-shrink: 0;
+        .edit-icon { 
+            position: absolute; top: 15px; right: 15px; font-size: 18px; opacity: 0.7; cursor: pointer;
+            padding: 5px; /* 增加點擊範圍 */
         }
-        .timeline-content {
-            background: #f9f9f9; padding: 10px; border-radius: 8px; flex: 1;
+        .flight-header { 
+            display: flex; justify-content: space-between; margin-bottom: 25px; 
+            font-weight: 600; font-size: 14px; opacity: 0.9;
         }
+        .flight-time { font-size: 22px; font-weight: 700; color: white;}
+        .flight-route {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;
+        }
+        .route-code { font-size: 32px; font-weight: 800; }
+        .plane-route-visual { flex: 1; text-align: center; position: relative; color: rgba(255,255,255,0.6); }
+        .plane-route-visual i { font-size: 24px; color: white; transform: rotate(90deg); }
+        .plane-route-visual::before, .plane-route-visual::after {
+            content: ''; position: absolute; top: 50%; width: 35%; height: 2px; border-top: 2px dashed rgba(255,255,255,0.4);
+        }
+        .plane-route-visual::before { left: 10px; }
+        .plane-route-visual::after { right: 10px; }
+        .flight-footer { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 500;}
+        .status-badge { background: white; color: #3a61b0; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;}
 
-        /* --- 景點圖片 --- */
-        .spot-img {
-            width: 100%; height: 140px; object-fit: cover; border-radius: 10px; margin-bottom: 8px;
+        /* --- 行程卡片樣式 --- */
+        .itinerary-card {
+            display: flex; padding: 20px; margin-bottom: 15px; position: relative;
         }
-        .map-link {
-            display: inline-block; margin-top: 8px; color: var(--primary-color);
-            text-decoration: none; font-size: 14px; font-weight: 500;
+        .card-icon-box {
+            width: 44px; height: 44px; background: #5a81ce; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;
+            margin-right: 15px; flex-shrink: 0;
         }
+        .card-content { flex: 1; }
+        .card-title { font-size: 18px; font-weight: 700; margin-bottom: 5px; }
+        .card-subtitle { font-size: 14px; color: #5a81ce; font-weight: 600; margin-bottom: 10px; display: flex; align-items: center;}
+        .card-desc { font-size: 14px; color: var(--text-gray); }
+        .card-time { position: absolute; bottom: 20px; left: 20px; font-weight: 700; font-size: 16px; }
+        .itinerary-card .card-content { margin-bottom: 30px; /* 留位給時間 */ }
+        .itinerary-card .edit-icon { color: var(--text-gray); }
 
         /* --- 底部導覽列 --- */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(10px);
-            border-top: 0.5px solid #c6c6c8;
+            background: rgba(255, 255, 255, 0.8);
+            -webkit-backdrop-filter: var(--frosted-blur);
+            backdrop-filter: var(--frosted-blur);
+            border-top: 0.5px solid rgba(0,0,0,0.1);
             display: flex; justify-content: space-around;
-            padding: 10px 0 25px 0; z-index: 1000;
+            padding: 12px 0; padding-bottom: env(safe-area-inset-bottom, 12px);
+            z-index: 100;
         }
         .nav-item {
-            text-align: center; font-size: 10px; color: #999; width: 25%;
+            text-align: center; font-size: 10px; color: #999; flex: 1;
+            display: flex; flex-direction: column; align-items: center;
         }
-        .nav-item.active { color: var(--primary-color); }
-        .nav-icon { font-size: 24px; display: block; margin-bottom: 2px; }
+        .nav-item.active { color: #5a81ce; }
+        .nav-icon { font-size: 22px; margin-bottom: 4px; }
 
-        /* 頁面切換 */
-        .page { display: none; animation: fadeIn 0.2s; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* --- 編輯彈窗 (Modal) --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4); z-index: 1000;
+            display: none; justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-container {
+            background: white; width: 85%; max-width: 320px;
+            border-radius: 20px; padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: modalPop 0.3s ease-out;
+        }
+        @keyframes modalPop {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-title { font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 20px; }
+        .modal-input-group { margin-bottom: 15px; }
+        .modal-label { display: block; font-size: 12px; color: var(--text-gray); margin-bottom: 5px; }
+        .modal-input { 
+            width: 100%; padding: 12px; border: 1px solid #eee; background: #f9f9f9;
+            border-radius: 10px; font-size: 16px; box-sizing: border-box;
+        }
+        .modal-actions { display: flex; justify-content: space-between; margin-top: 25px; gap: 15px;}
+        .modal-btn {
+            flex: 1; padding: 12px; border-radius: 12px; border: none; font-size: 16px; font-weight: 600; cursor: pointer;
+        }
+        .btn-cancel { background: #f2f2f7; color: var(--text-dark); }
+        .btn-save { background: var(--ios-blue); color: white; }
+        
+        /* 隱藏的文件上傳 Input */
+        #bg-upload-input { display: none; }
 
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1 id="header-title">行程</h1>
-        <p>東京之旅 2025</p>
+    <input type="file" id="bg-upload-input" accept="image/*">
+
+    <div class="header-container">
+        <div class="top-bar">
+            <div class="app-title" onclick="triggerBgUpload()">
+                eMenu Tokyo 
+                <i class="ri-image-edit-line" style="font-size: 16px; margin-left: 5px; opacity: 0.5;"></i>
+            </div>
+            <div class="currency-info">
+                目前匯率<br>1 JPY ≈ 0.052 HKD
+            </div>
+        </div>
+
+        <div class="day-navigator" id="day-nav">
+            </div>
     </div>
 
-    <div class="container">
-        
-        <div id="tab-1" class="page active">
-            <div class="card">
-                <h2>📅 新增行程</h2>
-                <div class="input-row">
-                    <input type="time" id="plan-time">
-                    <input type="text" id="plan-desc" placeholder="做什麼? (例如: 吃拉麵)">
-                    <button class="add-btn" onclick="addPlan()">＋</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>今日安排</h2>
-                <div id="plan-list">
-                    </div>
-            </div>
+    <div class="main-content" id="main-container">
         </div>
 
-        <div id="tab-2" class="page">
-            <div class="card">
-                <h2>🛍️ 加入清單</h2>
-                <div class="input-row">
-                    <input type="text" id="shop-input" placeholder="想買什麼? (例如: 藥妝)">
-                    <button class="add-btn" onclick="addShopItem()">＋</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>待買清單</h2>
-                <div id="shopping-list">
-                    </div>
-            </div>
-        </div>
-
-        <div id="tab-3" class="page">
-            <div class="card">
-                <img src="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600" class="spot-img">
-                <h2>東京鐵塔</h2>
-                <p style="font-size:14px; color:#666;">經典地標，建議黃昏前往。</p>
-                <a href="https://www.google.com/maps/search/?api=1&query=東京鐵塔" target="_blank" class="map-link">📍 在 Google Maps 開啟</a>
-            </div>
-            
-            <div class="card">
-                <img src="https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?w=600" class="spot-img">
-                <h2>河口湖</h2>
-                <p style="font-size:14px; color:#666;">富士山最佳觀賞點。</p>
-                <a href="https://www.google.com/maps/search/?api=1&query=河口湖" target="_blank" class="map-link">📍 在 Google Maps 開啟</a>
-            </div>
-        </div>
-
-    </div>
 
     <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab(1, '行程')">
-            <span class="nav-icon">📅</span> 行程
+        <div class="nav-item active">
+            <i class="ri-map-pin-user-fill nav-icon"></i> 行程
         </div>
-        <div class="nav-item" onclick="switchTab(2, '購物')">
-            <span class="nav-icon">🛒</span> 購物
+        <div class="nav-item">
+            <i class="ri-map-2-line nav-icon"></i> 地圖
         </div>
-        <div class="nav-item" onclick="switchTab(3, '景點')">
-            <span class="nav-icon">🗻</span> 景點
+        <div class="nav-item">
+            <i class="ri-wallet-3-line nav-icon"></i> 記帳
+        </div>
+        <div class="nav-item">
+            <i class="ri-shopping-bag-line nav-icon"></i> 購物
+        </div>
+        <div class="nav-item">
+            <i class="ri-information-line nav-icon"></i> 資訊
         </div>
     </div>
 
+
+    <div class="modal-overlay" id="edit-modal">
+        <div class="modal-container">
+            <h3 class="modal-title" id="modal-title">編輯項目</h3>
+            <div id="modal-form-content"></div>
+            <div class="modal-actions">
+                <button class="modal-btn btn-cancel" onclick="closeModal()">取消</button>
+                <button class="modal-btn btn-save" id="modal-save-btn">儲存</button>
+            </div>
+        </div>
+    </div>
+
+
     <script>
-        // --- 初始化資料 (LocalStorage) ---
-        // 這是讓資料不見的關鍵，我們會把資料存在瀏覽器裡面
-        
-        let shoppingData = JSON.parse(localStorage.getItem('myShopList')) || [
-            { id: 1, text: 'EVE 止痛藥', checked: false },
-            { id: 2, text: '東京香蕉蛋糕', checked: false }
-        ];
+        // ============================================
+        //  1. 資料結構 (Data Model)
+        // ============================================
+        // 這是整個 App 的核心資料庫。我們預設了一些資料，
+        // 當用戶編輯後，會儲存到 LocalStorage 並覆蓋這些預設值。
 
-        let planData = JSON.parse(localStorage.getItem('myPlanList')) || [
-            { id: 1, time: '10:00', text: '抵達東京成田機場' },
-            { id: 2, time: '12:00', text: '飯店 Check-in' }
-        ];
+        let tripData = {
+            currentDayIndex: 0, // 目前選中的是第幾天 (0 代表第一天)
+            days: [
+                {
+                    id: 1, label: 'Day 1', date: '08', fullDate: '2025-02-08',
+                    // 這裡的 events 陣列存放當天的所有卡片
+                    events: [
+                        {
+                            type: 'flight', // 類型：航班
+                            id: 'd1_f1',
+                            flightNo: 'HB320 航班前往東京',
+                            time: '09:05',
+                            fromCode: 'HKG',
+                            toCode: 'TYO'
+                        },
+                        {
+                            type: 'activity', // 類型：一般行程
+                            id: 'd1_a1',
+                            icon: 'ri-train-line', // 使用 RemixIcon 的代碼
+                            time: '15:00',
+                            title: 'NEX 成田特快',
+                            subtitle: '導航: 成田空港駅',
+                            desc: '前往新宿'
+                        }
+                    ]
+                },
+                {
+                    id: 2, label: 'Day 2', date: '09', fullDate: '2025-02-09',
+                    events: [
+                        {
+                            type: 'activity',
+                            id: 'd2_a1',
+                            icon: 'ri-hotel-bed-line',
+                            time: '10:00',
+                            title: '飯店 Check-out',
+                            subtitle: '新宿哥吉拉飯店',
+                            desc: '寄放行李'
+                        }
+                    ]
+                },
+                 { id: 3, label: 'Day 3', date: '10', fullDate: '2025-02-10', events: [] },
+                 { id: 4, label: 'Day 4', date: '11', fullDate: '2025-02-11', events: [] },
+                 { id: 5, label: 'Day 5', date: '12', fullDate: '2025-02-12', events: [] }
+            ]
+        };
 
-        // 啟動時先畫一次畫面
-        renderShop();
-        renderPlan();
-
-        // --- 購物清單邏輯 ---
-        function renderShop() {
-            const list = document.getElementById('shopping-list');
-            list.innerHTML = '';
-            
-            shoppingData.forEach((item, index) => {
-                const div = document.createElement('div');
-                div.className = `list-item ${item.checked ? 'completed' : ''}`;
-                div.onclick = (e) => {
-                    if(e.target.className !== 'delete-btn') toggleShop(index);
-                };
-                
-                div.innerHTML = `
-                    <div class="checkbox"></div>
-                    <span>${item.text}</span>
-                    <span class="delete-btn" onclick="deleteShop(${index})">✕</span>
-                `;
-                list.appendChild(div);
-            });
-            // 每次畫完都儲存
-            localStorage.setItem('myShopList', JSON.stringify(shoppingData));
-        }
-
-        function addShopItem() {
-            const input = document.getElementById('shop-input');
-            if (input.value.trim() === '') return;
-            
-            shoppingData.push({ 
-                id: Date.now(), 
-                text: input.value, 
-                checked: false 
-            });
-            input.value = '';
-            renderShop();
-        }
-
-        function toggleShop(index) {
-            shoppingData[index].checked = !shoppingData[index].checked;
-            renderShop();
-        }
-
-        function deleteShop(index) {
-            if(confirm('確定刪除?')) {
-                shoppingData.splice(index, 1);
-                renderShop();
+        // ============================================
+        //  2. 初始化與資料讀取
+        // ============================================
+        function initApp() {
+            // 嘗試從 LocalStorage 讀取舊資料
+            const savedData = localStorage.getItem('myTripData_v2');
+            if (savedData) {
+                tripData = JSON.parse(savedData);
             }
+
+            // 讀取儲存的背景圖
+            const savedBg = localStorage.getItem('customBgImage');
+            if(savedBg) {
+                document.documentElement.style.setProperty('--bg-image', `url(${savedBg})`);
+            }
+
+            // 開始渲染畫面
+            renderDayNav();
+            renderMainContent();
+
+            // 監聽背景圖上傳
+            document.getElementById('bg-upload-input').addEventListener('change', handleBgUpload);
         }
 
-        // --- 行程表邏輯 ---
-        function renderPlan() {
-            const list = document.getElementById('plan-list');
-            list.innerHTML = '';
-            
-            // 根據時間排序
-            planData.sort((a, b) => a.time.localeCompare(b.time));
+        function saveData() {
+            localStorage.setItem('myTripData_v2', JSON.stringify(tripData));
+            renderMainContent(); // 儲存後重新渲染內容
+        }
 
-            planData.forEach((item, index) => {
-                const div = document.createElement('div');
-                div.className = 'timeline-item';
-                div.innerHTML = `
-                    <div class="timeline-time">${item.time}</div>
-                    <div class="timeline-content">
-                        ${item.text}
-                        <div style="text-align:right; margin-top:5px;">
-                             <span class="delete-btn" onclick="deletePlan(${index})">刪除</span>
-                        </div>
+        // ============================================
+        //  3. 畫面渲染 (Rendering)
+        // ============================================
+
+        // 渲染上方日子導覽列
+        function renderDayNav() {
+            const navContainer = document.getElementById('day-nav');
+            navContainer.innerHTML = '';
+            tripData.days.forEach((day, index) => {
+                const isActive = index === tripData.currentDayIndex;
+                navContainer.innerHTML += `
+                    <div class="day-item ${isActive ? 'active' : ''}" onclick="switchDay(${index})">
+                        <span class="day-label">${day.label}</span>
+                        <span class="day-date">${day.date}</span>
                     </div>
                 `;
-                list.appendChild(div);
             });
-            localStorage.setItem('myPlanList', JSON.stringify(planData));
         }
 
-        function addPlan() {
-            const timeInput = document.getElementById('plan-time');
-            const descInput = document.getElementById('plan-desc');
+        // 切換日子
+        function switchDay(index) {
+            tripData.currentDayIndex = index;
+            renderDayNav();
+            // 加個淡入動畫效果
+            const mainContent = document.getElementById('main-container');
+            mainContent.style.opacity = 0;
+            setTimeout(() => {
+                renderMainContent();
+                mainContent.style.opacity = 1;
+            }, 150);
+            saveData(); // 記住用戶最後看哪一天
+        }
+
+        // 渲染主要內容區 (核心功能)
+        function renderMainContent() {
+            const container = document.getElementById('main-container');
+            container.innerHTML = '';
+
+            const currentDay = tripData.days[tripData.currentDayIndex];
+
+            // 加入標題欄 "行程安排 + 新增按鈕"
+            container.innerHTML += `
+                <div class="section-header">
+                    <div class="section-title">行程安排</div>
+                    <div class="add-btn">+ 新增</div>
+                </div>
+            `;
+
+            // 遍歷當天的所有事件並產生對應的卡片 HTML
+            currentDay.events.forEach(event => {
+                if (event.type === 'flight') {
+                    container.innerHTML += generateFlightCardHtml(event);
+                } else if (event.type === 'activity') {
+                    container.innerHTML += generateActivityCardHtml(event);
+                }
+            });
+        }
+
+        // 產生航班卡片 HTML 的函數
+        function generateFlightCardHtml(event) {
+            return `
+                <div class="flight-card frosted-card">
+                    <i class="ri-pencil-line edit-icon" onclick="openEditModal('flight', '${event.id}')"></i>
+                    <div class="flight-header">
+                        <div class="flight-time">${event.time}</div>
+                        <div>FLIGHT</div>
+                    </div>
+                    <div class="flight-route">
+                        <div class="route-code">${event.fromCode}</div>
+                        <div class="plane-route-visual">
+                            <i class="ri-plane-fill"></i>
+                        </div>
+                        <div class="route-code">${event.toCode}</div>
+                    </div>
+                    <div class="flight-footer">
+                        <div>${event.flightNo}</div>
+                        <div class="status-badge">已確認</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 產生行程卡片 HTML 的函數
+        function generateActivityCardHtml(event) {
+            return `
+                <div class="itinerary-card frosted-card">
+                    <i class="ri-pencil-line edit-icon" onclick="openEditModal('activity', '${event.id}')"></i>
+                    <div class="card-icon-box">
+                        <i class="${event.icon}"></i>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">${event.title}</div>
+                        <div class="card-subtitle">
+                            <i class="ri-navigation-fill" style="margin-right:4px; font-size:12px;"></i>
+                            ${event.subtitle}
+                        </div>
+                        <div class="card-desc">${event.desc}</div>
+                    </div>
+                    <div class="card-time">${event.time}</div>
+                </div>
+            `;
+        }
+
+
+        // ============================================
+        //  4. 編輯功能與彈窗 (Modal Logic)
+        // ============================================
+        
+        let currentEditEventId = null; // 用來記錄目前正在編輯哪個事件
+
+        function openEditModal(type, eventId) {
+            currentEditEventId = eventId;
+            const modal = document.getElementById('edit-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const formContent = document.getElementById('modal-form-content');
+            const saveBtn = document.getElementById('modal-save-btn');
+
+            // 找到要編輯的那個事件物件
+            const currentDayEvents = tripData.days[tripData.currentDayIndex].events;
+            const eventToEdit = currentDayEvents.find(e => e.id === eventId);
             
-            if (!timeInput.value || !descInput.value) {
-                alert('請輸入時間和內容');
-                return;
+            if (!eventToEdit) return;
+
+            modalTitle.innerText = type === 'flight' ? '編輯航班' : '編輯行程';
+            formContent.innerHTML = ''; // 清空舊表單
+
+            // 根據不同類型動態產生不同的輸入表單
+            if (type === 'flight') {
+                formContent.innerHTML = `
+                    ${createInputHtml('時間', 'time', 'time', eventToEdit.time)}
+                    ${createInputHtml('航班編號', 'text', 'flightNo', eventToEdit.flightNo)}
+                    <div style="display:flex; gap:10px;">
+                        ${createInputHtml('出發地', 'text', 'fromCode', eventToEdit.fromCode)}
+                        ${createInputHtml('目的地', 'text', 'toCode', eventToEdit.toCode)}
+                    </div>
+                `;
+            } else {
+                formContent.innerHTML = `
+                    ${createInputHtml('時間', 'time', 'time', eventToEdit.time)}
+                    ${createInputHtml('標題', 'text', 'title', eventToEdit.title)}
+                    ${createInputHtml('副標題 (地點)', 'text', 'subtitle', eventToEdit.subtitle)}
+                    ${createInputHtml('描述', 'text', 'desc', eventToEdit.desc)}
+                `;
             }
 
-            planData.push({
-                id: Date.now(),
-                time: timeInput.value,
-                text: descInput.value
-            });
-            
-            descInput.value = '';
-            renderPlan();
+            // 設定儲存按鈕的行為
+            saveBtn.onclick = () => saveEdit(type);
+            modal.classList.add('active');
         }
 
-        function deletePlan(index) {
-            if(confirm('確定刪除此行程?')) {
-                planData.splice(index, 1);
-                renderPlan();
+        // 輔助產生 Input HTML 的函數
+        function createInputHtml(label, type, id, value) {
+            return `
+                <div class="modal-input-group">
+                    <label class="modal-label" for="edit-${id}">${label}</label>
+                    <input type="${type}" id="edit-${id}" class="modal-input" value="${value}">
+                </div>
+            `;
+        }
+
+        function closeModal() {
+            document.getElementById('edit-modal').classList.remove('active');
+        }
+
+        // 儲存編輯後的資料
+        function saveEdit(type) {
+            const currentDayEvents = tripData.days[tripData.currentDayIndex].events;
+            const eventIndex = currentDayEvents.findIndex(e => e.id === currentEditEventId);
+            
+            if (eventIndex === -1) return;
+
+            // 從輸入框讀取新值並更新資料物件
+            if (type === 'flight') {
+                currentDayEvents[eventIndex].time = document.getElementById('edit-time').value;
+                currentDayEvents[eventIndex].flightNo = document.getElementById('edit-flightNo').value;
+                currentDayEvents[eventIndex].fromCode = document.getElementById('edit-fromCode').value;
+                currentDayEvents[eventIndex].toCode = document.getElementById('edit-toCode').value;
+            } else {
+                currentDayEvents[eventIndex].time = document.getElementById('edit-time').value;
+                currentDayEvents[eventIndex].title = document.getElementById('edit-title').value;
+                currentDayEvents[eventIndex].subtitle = document.getElementById('edit-subtitle').value;
+                currentDayEvents[eventIndex].desc = document.getElementById('edit-desc').value;
+            }
+
+            saveData(); // 儲存到 LocalStorage 並重新渲染
+            closeModal();
+        }
+
+        // ============================================
+        //  5. 背景圖更換功能
+        // ============================================
+        function triggerBgUpload() {
+            document.getElementById('bg-upload-input').click();
+        }
+
+        function handleBgUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                // 當檔案讀取完成後
+                reader.onload = function(e) {
+                    const imageDataUrl = e.target.result;
+                    // 設定 CSS 變數來變更背景
+                    document.documentElement.style.setProperty('--bg-image', `url(${imageDataUrl})`);
+                    // 將圖片資料存入 LocalStorage (注意：圖片太大可能會存失敗)
+                    try {
+                        localStorage.setItem('customBgImage', imageDataUrl);
+                    } catch (error) {
+                        alert('圖片檔案太大，無法儲存，但本次瀏覽有效。');
+                    }
+                };
+                reader.readAsDataURL(file);
             }
         }
 
-        // --- 頁面切換 ---
-        function switchTab(index, title) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
-            document.getElementById('tab-' + index).classList.add('active');
-            document.querySelectorAll('.nav-item')[index-1].classList.add('active');
-            document.getElementById('header-title').innerText = title;
-        }
+        // ============================================
+        //  啟動應用程式
+        // ============================================
+        initApp();
+
     </script>
 </body>
 </html>
