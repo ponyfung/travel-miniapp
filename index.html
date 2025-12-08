@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Travel App Ultra v9</title>
+    <title>Travel App Ultra v9.1</title>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
         :root {
-            --bg-glass: rgba(255, 255, 255, 0.75);
+            --bg-glass: rgba(255, 255, 255, 0.65); /* 稍微調低不透明度，因為背景已經矇了 */
             --blur: saturate(180%) blur(20px);
             --theme-color: #007aff;
             --radius: 24px;
@@ -15,14 +15,28 @@
             --danger: #ff3b30;
         }
 
+        /* === 修正後的背景設定 === */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Helvetica, Arial, sans-serif;
             margin: 0; padding: 0;
-            background-image: var(--bg-image, url('https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=1000'));
-            background-size: cover; background-position: center; background-attachment: fixed;
             color: var(--text-main);
             padding-bottom: 120px; 
             -webkit-tap-highlight-color: transparent;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: var(--bg-image, url('https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=1000'));
+            background-size: cover; 
+            background-position: center; 
+            filter: blur(15px); /* 全局模糊 */
+            -webkit-filter: blur(15px);
+            transform: scale(1.1); /* 避免白邊 */
+            z-index: -1;
         }
 
         /* --- 玻璃卡片 --- */
@@ -400,7 +414,10 @@
             }
             
             const bg = localStorage.getItem('ultraBg');
-            if(bg) document.body.style.backgroundImage = `url(${bg})`;
+            if(bg) {
+                // 更新 pseudo-element 的變數，而不是直接改 body style
+                document.documentElement.style.setProperty('--bg-image', `url(${bg})`);
+            }
 
             document.getElementById('sel-lang').value = appData.lang;
             document.getElementById('inp-start-date').value = appData.startDate;
@@ -710,7 +727,20 @@
         function closeModal(id){document.getElementById(id).classList.remove('show');}
         
         function triggerBgUpload(){document.getElementById('bg-upload').click();}
-        document.getElementById('bg-upload').onchange=(e)=>{const f=e.target.files[0];if(f){const r=new FileReader();r.onload=(v)=>{document.body.style.backgroundImage=`url(${v.target.result})`;try{localStorage.setItem('ultraBg',v.target.result);}catch(e){}};r.readAsDataURL(f);}};
+        
+        // 修改後的圖片上傳，使用 CSS 變數控制 pseudo-element
+        document.getElementById('bg-upload').onchange=(e)=>{
+            const f=e.target.files[0];
+            if(f){
+                const r=new FileReader();
+                r.onload=(v)=>{
+                    document.documentElement.style.setProperty('--bg-image', `url(${v.target.result})`);
+                    try{localStorage.setItem('ultraBg',v.target.result);}catch(e){}
+                };
+                r.readAsDataURL(f);
+            }
+        };
+
         function resetApp(){if(confirm('Reset?')){localStorage.removeItem('ultraTripData_v9');location.reload();}}
         function switchPage(pid,btn){currentPage=pid;document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('pg-'+pid).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));if(btn)btn.classList.add('active');
             if(pid==='map') document.getElementById('day-nav-container').style.display='none';
