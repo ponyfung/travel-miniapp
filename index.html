@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Travel App Ultra v11</title>
+    <title>Travel App Ultra v12</title>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
         :root {
-            /* 預設模糊度 */
             --bg-blur: 5px; 
             --bg-glass: rgba(255, 255, 255, 0.70);
             --glass-filter: saturate(180%) blur(20px);
@@ -27,7 +26,6 @@
             min-height: 100vh;
         }
 
-        /* 背景圖偽元素 (控制模糊) */
         body::before {
             content: "";
             position: fixed;
@@ -41,7 +39,6 @@
             transition: filter 0.2s ease;
         }
 
-        /* --- 玻璃卡片 --- */
         .glass-card {
             background: var(--bg-glass); 
             backdrop-filter: var(--glass-filter); -webkit-backdrop-filter: var(--glass-filter);
@@ -65,11 +62,7 @@
             backdrop-filter: blur(5px); cursor: pointer; border: 1px solid rgba(255,255,255,0.2);
         }
 
-        /* --- 日子導覽 --- */
-        .day-nav {
-            display: flex; overflow-x: auto; gap: 10px; padding: 10px 20px;
-            scrollbar-width: none;
-        }
+        .day-nav { display: flex; overflow-x: auto; gap: 10px; padding: 10px 20px; scrollbar-width: none; }
         .day-nav::-webkit-scrollbar { display: none; }
         .day-btn {
             min-width: 65px; height: 75px;
@@ -85,7 +78,6 @@
         .day-btn.add-day-btn { color: var(--theme-color); font-size: 24px; }
         .day-week { font-size: 10px; opacity: 0.8; margin-top: 2px; text-transform: uppercase; }
         
-        /* --- 航班卡片 --- */
         .flight-card {
             background: var(--bg-glass);
             backdrop-filter: var(--glass-filter); -webkit-backdrop-filter: var(--glass-filter);
@@ -94,62 +86,45 @@
             border: 2px solid var(--theme-color); 
             color: var(--text-main);
         }
-        .flight-tag { 
-            font-size: 10px; background: var(--theme-color); color: white;
-            padding: 3px 8px; border-radius: 6px; display: inline-block; margin-bottom: 10px; 
-        }
+        .flight-tag { font-size: 10px; background: var(--theme-color); color: white; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-bottom: 10px; }
         .flight-route { display: flex; justify-content: space-between; align-items: center; margin: 15px 0; }
         .route-code { font-size: 36px; font-weight: 800; color: var(--theme-color); }
         .flight-meta { display: flex; justify-content: space-between; font-size: 13px; opacity: 0.8; margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 10px; }
         .flight-note { font-size: 12px; background: rgba(0,0,0,0.05); padding: 5px 10px; border-radius: 8px; margin-top: 10px; display: inline-block;}
         .edit-icon { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.05); color: var(--text-main); padding: 6px; border-radius: 50%; cursor: pointer; }
 
-        /* --- 地圖/景點卡片 (v11 更新) --- */
         .map-card-item {
             background: white; border-radius: 16px; padding: 15px; margin-bottom: 10px;
             display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        /* 左側點擊區 (Google Maps) */
-        .map-click-area {
-            flex: 1; display: flex; align-items: center; cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer;
         }
         .map-info h4 { margin: 0 0 4px 0; font-size: 16px; color: var(--text-main); }
         .map-info p { margin: 0; font-size: 12px; color: #888; }
-        .map-icon-box { 
-            width: 40px; height: 40px; background: #f2f2f7; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center; color: var(--theme-color); margin-right: 15px;
-        }
-        /* 右側按鈕區 */
-        .map-actions {
-            display: flex; align-items: center; gap: 8px;
-        }
-        .action-icon {
-            width: 36px; height: 36px; border-radius: 50%; background: #f2f2f7;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--theme-color); cursor: pointer; transition: 0.2s;
-        }
-        .action-icon:active { transform: scale(0.9); }
-        .action-icon.link { background: #e8f0fe; color: #007aff; }
+        .map-icon-box { width: 40px; height: 40px; background: #f2f2f7; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--theme-color); margin-right: 15px; }
 
-        /* --- 列表 --- */
-        .timeline-item { display: flex; gap: 15px; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .time-col { font-weight: 700; color: var(--theme-color); width: 45px; flex-shrink: 0; font-size: 15px; padding-top: 2px;}
-        .info-col { flex: 1; }
-        .info-title { font-weight: 600; font-size: 16px; margin-bottom: 4px; }
+        /* --- 強化版行程列表 --- */
+        .timeline-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05); align-items: center; }
+        .time-col { font-weight: 700; color: var(--theme-color); width: 45px; flex-shrink: 0; font-size: 15px; }
+        .info-col { flex: 1; cursor: pointer; } /* 文字區域可點擊導航 */
+        .info-title { font-weight: 600; font-size: 16px; margin-bottom: 2px; }
         .info-sub { font-size: 13px; color: #666; }
+        /* 行程右側動作區 */
+        .action-area { display: flex; gap: 8px; }
+        .sm-btn { 
+            width: 32px; height: 32px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 16px; cursor: pointer; transition: 0.2s;
+        }
+        .sm-btn-link { background: #e8f0fe; color: #007aff; }
+        .sm-btn-del { background: transparent; color: var(--danger); opacity: 0.5; }
 
         .check-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .check-circle { 
-            width: 22px; height: 22px; border-radius: 50%; border: 2px solid #ccc; margin-right: 12px;
-            display: flex; align-items: center; justify-content: center; transition: 0.2s; cursor: pointer;
-        }
+        .check-circle { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #ccc; margin-right: 12px; display: flex; align-items: center; justify-content: center; transition: 0.2s; cursor: pointer; }
         .check-item.done .check-circle { background: var(--theme-color); border-color: var(--theme-color); }
         .check-item.done .check-circle::after { content: '✓'; color: white; font-size: 14px; }
         .check-item.done span { text-decoration: line-through; opacity: 0.5; }
         .trash-btn { margin-left: auto; color: var(--danger); opacity: 0.6; padding: 5px; cursor: pointer;}
 
-        /* --- 底部導覽 --- */
         .bottom-bar {
             position: fixed; bottom: 20px; left: 20px; right: 20px;
             background: rgba(30, 30, 30, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -158,17 +133,13 @@
         }
         .nav-item { color: rgba(255,255,255,0.5); font-size: 24px; transition: 0.2s; position: relative; cursor: pointer; }
         .nav-item.active { color: white; transform: translateY(-2px); }
-        .nav-item.active::after { 
-            content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
-            width: 4px; height: 4px; background: white; border-radius: 50%;
-        }
+        .nav-item.active::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: white; border-radius: 50%; }
         .fab-btn {
             background: var(--theme-color); color: white; border-radius: 50%; width: 45px; height: 45px; 
             display: flex; align-items: center; justify-content: center; transform: translateY(-8px); 
             box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer;
         }
 
-        /* --- 彈窗 --- */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px);
             z-index: 2000; display: none; align-items: center; justify-content: center;
@@ -187,12 +158,18 @@
         .btn-orange { background: #ff9500; color: white; }
         .btn-red { background: var(--danger); color: white; }
 
-        /* --- UI 元件 --- */
-        .converter-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; gap: 10px; }
-        .currency-select { padding: 10px; border-radius: 10px; border: 1px solid #ddd; background: #f9f9f9; font-weight: bold; width: 80px;}
-        .currency-arrow { color: #888; }
-        .rate-display { text-align: center; margin: 20px 0; font-size: 24px; font-weight: 800; color: var(--theme-color); }
-        .rate-sub { text-align: center; font-size: 12px; color: #888; margin-top: -15px; margin-bottom: 15px; }
+        /* --- 匯率計算機 UI (大改版) --- */
+        .calc-box { text-align: center; }
+        .calc-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+        .calc-input { 
+            width: 100%; font-size: 32px; font-weight: bold; border: none; text-align: center; 
+            border-bottom: 2px solid #eee; padding: 10px; color: var(--theme-color);
+            background: transparent;
+        }
+        .calc-input:focus { outline: none; border-bottom-color: var(--theme-color); }
+        .currency-select { padding: 5px 10px; border-radius: 20px; border: 1px solid #ddd; background: #f5f5f5; font-weight: bold; font-size: 14px;}
+        .calc-result { font-size: 20px; color: #666; margin-top: 10px; font-weight: 500; }
+        .rate-hint { font-size: 10px; color: #999; margin-top: 20px; }
 
         .code-box {
             width: 100%; height: 100px; padding: 10px; border-radius: 12px; border: 1px solid #eee; 
@@ -200,7 +177,6 @@
             box-sizing: border-box; resize: none; word-break: break-all;
         }
 
-        /* 頁面切換 */
         .page { display: none; padding: 0 20px; animation: fade 0.3s; }
         .page.active { display: block; }
         @keyframes fade { from{opacity:0;} to{opacity:1;} }
@@ -208,8 +184,6 @@
         .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee; }
         select.lang-select { padding: 8px; border-radius: 8px; border: 1px solid #ddd; }
         input[type="color"] { border: none; width: 30px; height: 30px; padding: 0; border-radius: 50%; overflow: hidden; cursor: pointer; }
-        
-        /* 模糊度拉桿 */
         input[type="range"] { -webkit-appearance: none; width: 100px; height: 5px; background: #ddd; border-radius: 5px; outline: none; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 15px; height: 15px; border-radius: 50%; background: var(--theme-color); cursor: pointer; }
     </style>
@@ -219,8 +193,8 @@
     <div class="header-area">
         <div class="app-title" id="lbl-app-title" onclick="editAppTitle()">My Trip</div>
         <div class="currency-pill" onclick="openConverter()">
-            <i class="ri-exchange-dollar-line"></i>
-            <span id="lbl-rate-display">--</span>
+            <i class="ri-calculator-line"></i>
+            <span id="lbl-rate-pill">匯率計算</span>
         </div>
     </div>
 
@@ -235,11 +209,11 @@
 
     <div id="pg-map" class="page">
         <div class="glass-card">
-            <h3 id="lbl-map-title">我的景點</h3>
+            <h3 id="lbl-map-title">我的地圖</h3>
             <div id="map-list-container"></div>
             <div style="text-align:center; padding:20px; color:#666; font-size:12px; cursor:pointer;" onclick="handleFabClick()">
                 <i class="ri-add-circle-line" style="font-size:20px; vertical-align:middle;"></i>
-                <span id="lbl-add-map">新增景點</span>
+                <span id="lbl-add-map">新增地點</span>
             </div>
         </div>
     </div>
@@ -328,17 +302,38 @@
     </div>
 
     <div class="modal-overlay" id="modal-converter">
-        <div class="modal-box">
-            <h3>匯率轉換</h3>
-            <div class="converter-row">
-                <select id="conv-from" class="currency-select" onchange="updateRate()"><option value="HKD">HKD</option><option value="JPY">JPY</option><option value="USD">USD</option><option value="TWD">TWD</option><option value="EUR">EUR</option></select>
-                <i class="ri-arrow-right-line currency-arrow"></i>
-                <select id="conv-to" class="currency-select" onchange="updateRate()"><option value="JPY">JPY</option><option value="HKD">HKD</option><option value="USD">USD</option><option value="TWD">TWD</option><option value="EUR">EUR</option></select>
+        <div class="modal-box calc-box">
+            <h3 style="margin-top:0;">匯率計算機</h3>
+            
+            <div class="calc-row">
+                <input type="number" id="calc-input" class="calc-input" value="1000" oninput="calculateCurrency()">
+                <select id="conv-from" class="currency-select" onchange="calculateCurrency()">
+                    <option value="HKD">HKD</option><option value="JPY">JPY</option><option value="USD">USD</option>
+                    <option value="TWD">TWD</option><option value="EUR">EUR</option>
+                </select>
             </div>
-            <div class="rate-display" id="conv-result">--</div>
-            <div class="rate-sub">點擊上方數字可手動修改</div>
-            <div class="inp-group" id="manual-rate-box" style="display:none;"><label class="inp-label">手動匯率</label><input type="number" step="0.0001" id="manual-rate-inp" class="modal-inp"></div>
-            <div class="btn-row"><button class="btn btn-cancel" onclick="closeModal('modal-converter')">關閉</button><button class="btn btn-save" onclick="saveRate()">設定</button></div>
+
+            <i class="ri-arrow-down-line" style="color:#ccc; font-size:20px;"></i>
+
+            <div class="calc-row" style="margin-top:10px;">
+                <div id="calc-output" class="calc-input" style="border:none; color:#666;">--</div>
+                <select id="conv-to" class="currency-select" onchange="calculateCurrency()">
+                    <option value="JPY">JPY</option><option value="HKD">HKD</option><option value="USD">USD</option>
+                    <option value="TWD">TWD</option><option value="EUR">EUR</option>
+                </select>
+            </div>
+
+            <div class="rate-hint" onclick="toggleRateEdit()">
+                目前匯率: <span id="current-rate-display">--</span> (點擊修改)
+            </div>
+            <div id="rate-edit-box" style="display:none; margin-top:10px;">
+                <input type="number" id="manual-rate-inp" placeholder="手動匯率" style="padding:5px; width:80px; border:1px solid #ddd; border-radius:5px;">
+                <button class="btn btn-green" style="padding:5px 10px; font-size:12px;" onclick="saveManualRate()">確認</button>
+            </div>
+
+            <div class="btn-row" style="margin-top:20px;">
+                <button class="btn btn-cancel" onclick="closeModal('modal-converter')">關閉</button>
+            </div>
         </div>
     </div>
 
@@ -415,7 +410,6 @@
             outboundFlight: { code: 'CX500', from: 'HKG', to: 'TYO', time: '09:05', note: 'T1' },
             inboundFlight: { code: 'CX501', from: 'TYO', to: 'HKG', time: '18:30', note: '' },
             shopList: [{ id: 1, text: "EVE 止痛藥", done: false }],
-            // mapList 結構更新: { name, time, note, url }
             mapList: [],
             days: [[], [], [], []] 
         };
@@ -426,7 +420,7 @@
         // 3. 邏輯與初始化
         // ============================================
         function init() {
-            const saved = localStorage.getItem('ultraTripData_v11'); // v11
+            const saved = localStorage.getItem('ultraTripData_v12'); // v12
             if (saved) {
                 appData = { ...appData, ...JSON.parse(saved) };
             }
@@ -446,7 +440,7 @@
         }
 
         function save() {
-            localStorage.setItem('ultraTripData_v11', JSON.stringify(appData));
+            localStorage.setItem('ultraTripData_v12', JSON.stringify(appData));
         }
 
         function changeTheme(color) {
@@ -481,48 +475,61 @@
             }
         }
 
-        // --- 匯率 ---
+        // --- 匯率計算機 (New Logic) ---
         function openConverter() {
             const modal = document.getElementById('modal-converter');
+            // 載入設定
             document.getElementById('conv-from').value = appData.currency.from;
             document.getElementById('conv-to').value = appData.currency.to;
-            updateRateDisplay(appData.currency.rate);
+            // 嘗試自動更新匯率，然後計算
+            fetchRate().then(() => {
+                calculateCurrency();
+            });
             modal.classList.add('show');
-            updateRate(); 
         }
 
-        async function updateRate() {
+        async function fetchRate() {
             const from = document.getElementById('conv-from').value;
             const to = document.getElementById('conv-to').value;
-            const display = document.getElementById('conv-result');
-            display.style.opacity = 0.5;
             try {
                 const res = await fetch(`https://open.er-api.com/v6/latest/${from}`);
                 const data = await res.json();
                 const rate = data.rates[to];
-                if(rate) updateRateDisplay(rate);
-            } catch (e) {}
-            display.style.opacity = 1;
+                if(rate) {
+                    appData.currency.rate = rate; // 更新內存匯率
+                    save();
+                }
+            } catch (e) { console.log("Offline or Error"); }
         }
 
-        function updateRateDisplay(rate) {
-            const r = parseFloat(rate);
-            const val = r > 10 ? r.toFixed(2) : r.toFixed(4);
-            document.getElementById('conv-result').innerText = `1 ${document.getElementById('conv-from').value} ≈ ${val} ${document.getElementById('conv-to').value}`;
-            document.getElementById('manual-rate-inp').value = r;
-        }
-
-        document.getElementById('conv-result').onclick = function() {
-            document.getElementById('manual-rate-box').style.display = 'block';
-        };
-
-        function saveRate() {
+        function calculateCurrency() {
+            const amount = parseFloat(document.getElementById('calc-input').value) || 0;
+            const rate = appData.currency.rate;
+            const result = (amount * rate).toFixed(2);
+            
+            document.getElementById('calc-output').innerText = result;
+            document.getElementById('current-rate-display').innerText = `1 ${document.getElementById('conv-from').value} = ${rate.toFixed(4)} ${document.getElementById('conv-to').value}`;
+            
+            // 同步儲存幣種選擇
             appData.currency.from = document.getElementById('conv-from').value;
             appData.currency.to = document.getElementById('conv-to').value;
-            const manual = document.getElementById('manual-rate-inp').value;
-            appData.currency.rate = parseFloat(manual);
-            save(); renderCurrency(); closeModal('modal-converter');
-            document.getElementById('manual-rate-box').style.display = 'none';
+            save();
+        }
+
+        function toggleRateEdit() {
+            const box = document.getElementById('rate-edit-box');
+            box.style.display = box.style.display === 'none' ? 'block' : 'none';
+            document.getElementById('manual-rate-inp').value = appData.currency.rate;
+        }
+
+        function saveManualRate() {
+            const val = parseFloat(document.getElementById('manual-rate-inp').value);
+            if(val) {
+                appData.currency.rate = val;
+                save();
+                calculateCurrency();
+                document.getElementById('rate-edit-box').style.display = 'none';
+            }
         }
 
         // --- 標題與分享 ---
@@ -583,44 +590,31 @@
             modal.classList.add('show');
         }
 
-        // --- 渲染 (更新地圖邏輯) ---
+        // --- 渲染 ---
         function renderMapList() {
             const list = document.getElementById('map-list-container'); list.innerHTML = '';
             if(appData.mapList.length === 0) { list.innerHTML = `<div style="text-align:center; opacity:0.5; padding:20px;">尚無景點</div>`; return; }
             
             appData.mapList.forEach((item, idx) => {
                 const div = document.createElement('div'); div.className = 'map-card-item';
-                
-                // 網址按鈕 (如果有)
                 let urlBtnHtml = '';
                 if(item.url && item.url.trim() !== "") {
-                    urlBtnHtml = `<div class="action-icon link" onclick="window.open('${item.url}')"><i class="ri-global-line"></i></div>`;
+                    urlBtnHtml = `<div class="action-area" style="margin-right:10px;"><div class="sm-btn sm-btn-link" onclick="window.open('${item.url}')"><i class="ri-global-line"></i></div></div>`;
                 }
-
                 div.innerHTML = `
-                    <div class="map-click-area" onclick="window.open('https://www.google.com/maps/search/?api=1&query=$${encodeURIComponent(item.name)}')">
+                    <div class="map-click-area" style="flex:1; display:flex; align-items:center;" onclick="window.open('https://www.google.com/maps/search/?api=1&query=$${encodeURIComponent(item.name)}')">
                         <div class="map-icon-box"><i class="ri-map-pin-2-fill"></i></div>
-                        <div class="map-info">
-                            <h4>${item.name}</h4>
-                            <p>${item.time ? item.time + ' • ' : ''}${item.note || ''}</p>
-                        </div>
+                        <div class="map-info"><h4>${item.name}</h4><p>${item.time ? item.time + ' • ' : ''}${item.note || ''}</p></div>
                     </div>
-                    <div class="map-actions">
-                        ${urlBtnHtml}
-                        <div class="action-icon" style="color:var(--danger);" onclick="delMap(${idx})"><i class="ri-delete-bin-line"></i></div>
-                    </div>
+                    ${urlBtnHtml}
+                    <div class="sm-btn sm-btn-del" onclick="delMap(${idx})"><i class="ri-delete-bin-line"></i></div>
                 `;
                 list.appendChild(div);
             });
         }
         function delMap(idx) { if(confirm('刪除？')) { appData.mapList.splice(idx, 1); renderMapList(); save(); } }
 
-        function renderUI() { renderCurrency(); renderDayNav(); renderTripList(); renderShopList(); renderMapList(); }
-
-        function renderCurrency() {
-            const { from, to, rate } = appData.currency;
-            document.getElementById('lbl-rate-display').innerText = `1 ${from} ≈ ${rate} ${to}`;
-        }
+        function renderUI() { renderDayNav(); renderTripList(); renderShopList(); renderMapList(); }
         
         function getDateInfo(dayIndex) {
             const date = new Date(appData.startDate);
@@ -654,6 +648,7 @@
             if(btn) btn.innerText = txt.delDay + ` (Day ${appData.currentDayIdx + 1})`;
         }
 
+        // --- 行程列表 (整合 URL 功能) ---
         function renderTripList() {
             const list = document.getElementById('trip-list-container'); list.innerHTML = '';
             const txt = i18n[appData.lang];
@@ -664,8 +659,26 @@
             if(events.length > 0) {
                 const card = document.createElement('div'); card.className = 'glass-card';
                 events.sort((a,b)=>a.time.localeCompare(b.time));
-                let h=''; events.forEach((ev,i)=>{
-                    h+=`<div class="timeline-item"><div class="time-col">${ev.time}</div><div class="info-col"><div class="info-title">${ev.title}</div><div class="info-sub">${ev.sub}</div></div><i class="ri-close-circle-line" style="color:var(--danger);opacity:0.3;cursor:pointer;" onclick="delEvent(${i})"></i></div>`;
+                let h=''; 
+                events.forEach((ev,i)=>{
+                    // 檢查是否有 URL
+                    let urlBtn = '';
+                    if(ev.url && ev.url.trim() !== "") {
+                        urlBtn = `<div class="sm-btn sm-btn-link" onclick="window.open('${ev.url}')"><i class="ri-global-line"></i></div>`;
+                    }
+
+                    h+=`
+                    <div class="timeline-item">
+                        <div class="time-col">${ev.time}</div>
+                        <div class="info-col" onclick="window.open('https://www.google.com/maps/search/?api=1&query=東京鐵塔2{encodeURIComponent(ev.title)}')">
+                            <div class="info-title">${ev.title}</div>
+                            <div class="info-sub">${ev.sub}</div>
+                        </div>
+                        <div class="action-area">
+                            ${urlBtn}
+                            <div class="sm-btn sm-btn-del" onclick="delEvent(${i})"><i class="ri-delete-bin-line"></i></div>
+                        </div>
+                    </div>`;
                 });
                 card.innerHTML=h; list.appendChild(card);
             } else if(!isFirst && !isLast) { list.innerHTML+=`<div style="text-align:center;padding:30px;opacity:0.5;">No Events</div>`; }
@@ -686,12 +699,22 @@
             return `<div class="flight-card"><div class="edit-icon" onclick="editFlight('${t}')"><i class="ri-pencil-line"></i></div><span class="flight-tag">${l}</span><div class="flight-route"><span class="route-code">${f.from}</span><i class="ri-plane-fill" style="font-size:24px;opacity:0.6;"></i><span class="route-code">${f.to}</span></div><div class="flight-meta"><span><i class="ri-time-line"></i> ${f.time}</span><span>${f.code}</span></div>${f.note?`<div class="flight-note">${f.note}</div>`:''}</div>`;
         }
 
-        // --- 互動邏輯 (更新 map 彈窗) ---
+        // --- 互動邏輯 (新增 URL 欄位) ---
         function handleFabClick() {
             const txt = i18n[appData.lang];
             if(currentPage === 'trip') {
-                openModal(`<div class="inp-group"><label class="inp-label">Time</label><input type="time" id="e-time" class="modal-inp" value="12:00"></div><div class="inp-group"><label class="inp-label">Title</label><input id="e-title" class="modal-inp"></div><div class="inp-group"><label class="inp-label">Note</label><input id="e-sub" class="modal-inp"></div>`, ()=>{
-                    appData.days[appData.currentDayIdx].push({time:document.getElementById('e-time').value, title:document.getElementById('e-title').value, sub:document.getElementById('e-sub').value});
+                openModal(`
+                    <div class="inp-group"><label class="inp-label">${txt.locTime}</label><input type="time" id="e-time" class="modal-inp" value="12:00"></div>
+                    <div class="inp-group"><label class="inp-label">${txt.itemPlace} (地點)</label><input id="e-title" class="modal-inp" placeholder="例如: 清水寺"></div>
+                    <div class="inp-group"><label class="inp-label">${txt.urlPlace}</label><input id="e-url" class="modal-inp" placeholder="https://..."></div>
+                    <div class="inp-group"><label class="inp-label">${txt.note}</label><input id="e-sub" class="modal-inp" placeholder="備註"></div>
+                `, ()=>{
+                    appData.days[appData.currentDayIdx].push({
+                        time:document.getElementById('e-time').value, 
+                        title:document.getElementById('e-title').value, 
+                        url:document.getElementById('e-url').value,
+                        sub:document.getElementById('e-sub').value
+                    });
                     save(); renderUI();
                 });
             } else if(currentPage === 'shop') {
@@ -746,7 +769,7 @@
         
         function triggerBgUpload(){document.getElementById('bg-upload').click();}
         document.getElementById('bg-upload').onchange=(e)=>{const f=e.target.files[0];if(f){const r=new FileReader();r.onload=(v)=>{document.documentElement.style.setProperty('--bg-image', `url(${v.target.result})`); try{localStorage.setItem('ultraBg',v.target.result);}catch(e){}};r.readAsDataURL(f);}};
-        function resetApp(){if(confirm('Reset?')){localStorage.removeItem('ultraTripData_v11');location.reload();}}
+        function resetApp(){if(confirm('Reset?')){localStorage.removeItem('ultraTripData_v12');location.reload();}}
         function switchPage(pid,btn){currentPage=pid;document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('pg-'+pid).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));if(btn)btn.classList.add('active');
             if(pid==='map') document.getElementById('day-nav-container').style.display='none';
             else if(pid==='trip') document.getElementById('day-nav-container').style.display='flex';
