@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Travel App Ultra v10</title>
+    <title>Travel App Ultra v11</title>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
         :root {
-            /* 預設模糊度改細了 */
+            /* 預設模糊度 */
             --bg-blur: 5px; 
             --bg-glass: rgba(255, 255, 255, 0.70);
             --glass-filter: saturate(180%) blur(20px);
@@ -35,11 +35,10 @@
             background-image: var(--bg-image, url('https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=1000'));
             background-size: cover; 
             background-position: center; 
-            /* 使用變數控制模糊 */
             filter: blur(var(--bg-blur)); -webkit-filter: blur(var(--bg-blur));
-            transform: scale(1.05); /* 輕微放大防止白邊 */
+            transform: scale(1.05);
             z-index: -1;
-            transition: filter 0.2s ease; /* 調整時有順滑動畫 */
+            transition: filter 0.2s ease;
         }
 
         /* --- 玻璃卡片 --- */
@@ -105,11 +104,15 @@
         .flight-note { font-size: 12px; background: rgba(0,0,0,0.05); padding: 5px 10px; border-radius: 8px; margin-top: 10px; display: inline-block;}
         .edit-icon { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.05); color: var(--text-main); padding: 6px; border-radius: 50%; cursor: pointer; }
 
-        /* --- 地圖卡片 --- */
+        /* --- 地圖/景點卡片 (v11 更新) --- */
         .map-card-item {
             background: white; border-radius: 16px; padding: 15px; margin-bottom: 10px;
             display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        /* 左側點擊區 (Google Maps) */
+        .map-click-area {
+            flex: 1; display: flex; align-items: center; cursor: pointer;
         }
         .map-info h4 { margin: 0 0 4px 0; font-size: 16px; color: var(--text-main); }
         .map-info p { margin: 0; font-size: 12px; color: #888; }
@@ -117,6 +120,17 @@
             width: 40px; height: 40px; background: #f2f2f7; border-radius: 12px;
             display: flex; align-items: center; justify-content: center; color: var(--theme-color); margin-right: 15px;
         }
+        /* 右側按鈕區 */
+        .map-actions {
+            display: flex; align-items: center; gap: 8px;
+        }
+        .action-icon {
+            width: 36px; height: 36px; border-radius: 50%; background: #f2f2f7;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--theme-color); cursor: pointer; transition: 0.2s;
+        }
+        .action-icon:active { transform: scale(0.9); }
+        .action-icon.link { background: #e8f0fe; color: #007aff; }
 
         /* --- 列表 --- */
         .timeline-item { display: flex; gap: 15px; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
@@ -221,11 +235,11 @@
 
     <div id="pg-map" class="page">
         <div class="glass-card">
-            <h3 id="lbl-map-title">我的地圖</h3>
+            <h3 id="lbl-map-title">我的景點</h3>
             <div id="map-list-container"></div>
             <div style="text-align:center; padding:20px; color:#666; font-size:12px; cursor:pointer;" onclick="handleFabClick()">
                 <i class="ri-add-circle-line" style="font-size:20px; vertical-align:middle;"></i>
-                <span id="lbl-add-map">新增地點</span>
+                <span id="lbl-add-map">新增景點</span>
             </div>
         </div>
     </div>
@@ -350,8 +364,9 @@
                 bg: "更換背景", reset: "重置資料", hintAdd: "按中間 + 號新增",
                 save: "儲存", cancel: "取消", day: "Day", addDay: "加一日",
                 weekdays: ["週日", "週一", "週二", "週三", "週四", "週五", "週六"],
-                shopTitle: "購物清單", mapTitle: "我的地圖", addMap: "新增地點",
-                itemPlace: "項目名稱", locName: "地點名稱", locTime: "時間 (選填)",
+                shopTitle: "購物清單", mapTitle: "我的景點", addMap: "新增景點",
+                itemPlace: "項目名稱", locName: "景點名稱", locTime: "時間 (選填)",
+                urlPlace: "網址 (URL, 選填)",
                 copy: "複製代碼", import: "匯入", importDesc: "警告：匯入將會覆蓋現有資料！", exportDesc: "複製此代碼並傳送給朋友",
                 successImport: "匯入成功！", invalidCode: "無效的代碼",
                 delDay: "刪除目前日子", confirmDelDay: "確定要刪除這一天 (Day {0}) 及其所有行程嗎？此動作無法復原。"
@@ -363,8 +378,9 @@
                 bg: "Change Background", reset: "Reset Data", hintAdd: "Press + to add",
                 save: "Save", cancel: "Cancel", day: "Day", addDay: "Add Day",
                 weekdays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-                shopTitle: "Shopping List", mapTitle: "My Maps", addMap: "Add Location",
-                itemPlace: "Item Name", locName: "Location Name", locTime: "Time (Optional)",
+                shopTitle: "Shopping List", mapTitle: "My Spots", addMap: "Add Spot",
+                itemPlace: "Item Name", locName: "Spot Name", locTime: "Time (Optional)",
+                urlPlace: "URL (Optional)",
                 copy: "Copy Code", import: "Import", importDesc: "Warning: Import will overwrite current data!", exportDesc: "Copy and send this code to friend",
                 successImport: "Success!", invalidCode: "Invalid Code",
                 delDay: "Delete Current Day", confirmDelDay: "Delete Day {0} and all its events? This cannot be undone."
@@ -376,8 +392,9 @@
                 bg: "背景変更", reset: "リセット", hintAdd: "+ ボタンで追加",
                 save: "保存", cancel: "キャンセル", day: "Day", addDay: "追加",
                 weekdays: ["日", "月", "火", "水", "木", "金", "土"],
-                shopTitle: "買い物リスト", mapTitle: "マイマップ", addMap: "場所を追加",
-                itemPlace: "アイテム名", locName: "場所名", locTime: "時間 (任意)",
+                shopTitle: "買い物リスト", mapTitle: "スポット", addMap: "スポット追加",
+                itemPlace: "アイテム名", locName: "スポット名", locTime: "時間 (任意)",
+                urlPlace: "URL (任意)",
                 copy: "コピー", import: "インポート", importDesc: "注意：現在のデータは上書きされます", exportDesc: "コードをコピーして友達に送る",
                 successImport: "成功！", invalidCode: "無効なコード",
                 delDay: "この日を削除", confirmDelDay: "Day {0} を削除しますか？"
@@ -392,12 +409,13 @@
             lang: 'zh',
             startDate: '2025-12-27',
             themeColor: '#007aff',
-            blurLevel: 5, // 預設模糊度
+            blurLevel: 5,
             currentDayIdx: 0,
             currency: { from: 'HKD', to: 'JPY', rate: 19.5 }, 
             outboundFlight: { code: 'CX500', from: 'HKG', to: 'TYO', time: '09:05', note: 'T1' },
             inboundFlight: { code: 'CX501', from: 'TYO', to: 'HKG', time: '18:30', note: '' },
             shopList: [{ id: 1, text: "EVE 止痛藥", done: false }],
+            // mapList 結構更新: { name, time, note, url }
             mapList: [],
             days: [[], [], [], []] 
         };
@@ -408,7 +426,7 @@
         // 3. 邏輯與初始化
         // ============================================
         function init() {
-            const saved = localStorage.getItem('ultraTripData_v10'); // v10
+            const saved = localStorage.getItem('ultraTripData_v11'); // v11
             if (saved) {
                 appData = { ...appData, ...JSON.parse(saved) };
             }
@@ -428,10 +446,9 @@
         }
 
         function save() {
-            localStorage.setItem('ultraTripData_v10', JSON.stringify(appData));
+            localStorage.setItem('ultraTripData_v11', JSON.stringify(appData));
         }
 
-        // --- 外觀設定 ---
         function changeTheme(color) {
             appData.themeColor = color;
             applyTheme(color);
@@ -441,7 +458,6 @@
             document.documentElement.style.setProperty('--theme-color', color);
         }
 
-        // --- 模糊度控制 (New) ---
         function changeBlur(val) {
             appData.blurLevel = val;
             applyBlur(val);
@@ -451,28 +467,17 @@
             document.documentElement.style.setProperty('--bg-blur', val + 'px');
         }
 
-        // --- 刪除日子 (New) ---
         function deleteCurrentDay() {
             const idx = appData.currentDayIdx;
-            // 至少保留一天
-            if (appData.days.length <= 1) {
-                alert("至少需要保留一天！");
-                return;
-            }
-
+            if (appData.days.length <= 1) { alert("至少需要保留一天！"); return; }
             const txt = i18n[appData.lang];
             const confirmMsg = txt.confirmDelDay.replace("{0}", idx + 1);
-
             if (confirm(confirmMsg)) {
-                // 刪除該日
                 appData.days.splice(idx, 1);
-                // 調整索引，避免超出範圍
                 if (appData.currentDayIdx >= appData.days.length) {
                     appData.currentDayIdx = appData.days.length - 1;
                 }
-                save();
-                renderUI();
-                alert("已刪除 Day " + (idx + 1));
+                save(); renderUI(); alert("已刪除 Day " + (idx + 1));
             }
         }
 
@@ -578,17 +583,33 @@
             modal.classList.add('show');
         }
 
-        // --- 渲染 ---
+        // --- 渲染 (更新地圖邏輯) ---
         function renderMapList() {
             const list = document.getElementById('map-list-container'); list.innerHTML = '';
-            if(appData.mapList.length === 0) { list.innerHTML = `<div style="text-align:center; opacity:0.5; padding:20px;">尚無地點</div>`; return; }
+            if(appData.mapList.length === 0) { list.innerHTML = `<div style="text-align:center; opacity:0.5; padding:20px;">尚無景點</div>`; return; }
+            
             appData.mapList.forEach((item, idx) => {
                 const div = document.createElement('div'); div.className = 'map-card-item';
-                div.onclick = (e) => {
-                    if(e.target.classList.contains('ri-delete-bin-line')) return;
-                    window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.name)}`);
-                };
-                div.innerHTML = `<div style="display:flex; align-items:center;"><div class="map-icon-box"><i class="ri-map-pin-2-fill"></i></div><div class="map-info"><h4>${item.name}</h4><p>${item.time ? item.time + ' • ' : ''}${item.note || ''}</p></div></div><i class="ri-delete-bin-line trash-btn" onclick="delMap(${idx})"></i>`;
+                
+                // 網址按鈕 (如果有)
+                let urlBtnHtml = '';
+                if(item.url && item.url.trim() !== "") {
+                    urlBtnHtml = `<div class="action-icon link" onclick="window.open('${item.url}')"><i class="ri-global-line"></i></div>`;
+                }
+
+                div.innerHTML = `
+                    <div class="map-click-area" onclick="window.open('https://www.google.com/maps/search/?api=1&query=$${encodeURIComponent(item.name)}')">
+                        <div class="map-icon-box"><i class="ri-map-pin-2-fill"></i></div>
+                        <div class="map-info">
+                            <h4>${item.name}</h4>
+                            <p>${item.time ? item.time + ' • ' : ''}${item.note || ''}</p>
+                        </div>
+                    </div>
+                    <div class="map-actions">
+                        ${urlBtnHtml}
+                        <div class="action-icon" style="color:var(--danger);" onclick="delMap(${idx})"><i class="ri-delete-bin-line"></i></div>
+                    </div>
+                `;
                 list.appendChild(div);
             });
         }
@@ -665,7 +686,7 @@
             return `<div class="flight-card"><div class="edit-icon" onclick="editFlight('${t}')"><i class="ri-pencil-line"></i></div><span class="flight-tag">${l}</span><div class="flight-route"><span class="route-code">${f.from}</span><i class="ri-plane-fill" style="font-size:24px;opacity:0.6;"></i><span class="route-code">${f.to}</span></div><div class="flight-meta"><span><i class="ri-time-line"></i> ${f.time}</span><span>${f.code}</span></div>${f.note?`<div class="flight-note">${f.note}</div>`:''}</div>`;
         }
 
-        // --- 互動邏輯 ---
+        // --- 互動邏輯 (更新 map 彈窗) ---
         function handleFabClick() {
             const txt = i18n[appData.lang];
             if(currentPage === 'trip') {
@@ -678,9 +699,22 @@
                     const v=document.getElementById('s-name').value; if(v){appData.shopList.push({id:Date.now(), text:v, done:false}); save(); renderUI();}
                 });
             } else if(currentPage === 'map') {
-                openModal(`<div class="inp-group"><label class="inp-label">${txt.locName} (必填)</label><input id="m-name" class="modal-inp" placeholder="例如: 東京鐵塔"></div><div class="inp-group"><label class="inp-label">${txt.locTime}</label><input type="time" id="m-time" class="modal-inp"></div><div class="inp-group"><label class="inp-label">${txt.note}</label><input id="m-note" class="modal-inp"></div>`, () => {
+                openModal(`
+                    <div class="inp-group"><label class="inp-label">${txt.locName} (必填)</label><input id="m-name" class="modal-inp" placeholder="例如: 東京鐵塔"></div>
+                    <div class="inp-group"><label class="inp-label">${txt.urlPlace}</label><input id="m-url" class="modal-inp" placeholder="https://..."></div>
+                    <div class="inp-group"><label class="inp-label">${txt.locTime}</label><input type="time" id="m-time" class="modal-inp"></div>
+                    <div class="inp-group"><label class="inp-label">${txt.note}</label><input id="m-note" class="modal-inp"></div>
+                `, () => {
                     const name = document.getElementById('m-name').value;
-                    if(name) { appData.mapList.push({ name: name, time: document.getElementById('m-time').value, note: document.getElementById('m-note').value }); save(); renderUI(); }
+                    if(name) { 
+                        appData.mapList.push({ 
+                            name: name, 
+                            url: document.getElementById('m-url').value,
+                            time: document.getElementById('m-time').value, 
+                            note: document.getElementById('m-note').value 
+                        }); 
+                        save(); renderUI(); 
+                    }
                 });
             }
         }
@@ -712,7 +746,7 @@
         
         function triggerBgUpload(){document.getElementById('bg-upload').click();}
         document.getElementById('bg-upload').onchange=(e)=>{const f=e.target.files[0];if(f){const r=new FileReader();r.onload=(v)=>{document.documentElement.style.setProperty('--bg-image', `url(${v.target.result})`); try{localStorage.setItem('ultraBg',v.target.result);}catch(e){}};r.readAsDataURL(f);}};
-        function resetApp(){if(confirm('Reset?')){localStorage.removeItem('ultraTripData_v10');location.reload();}}
+        function resetApp(){if(confirm('Reset?')){localStorage.removeItem('ultraTripData_v11');location.reload();}}
         function switchPage(pid,btn){currentPage=pid;document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('pg-'+pid).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));if(btn)btn.classList.add('active');
             if(pid==='map') document.getElementById('day-nav-container').style.display='none';
             else if(pid==='trip') document.getElementById('day-nav-container').style.display='flex';
