@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Travel App Ultra v10</title>
+    <title>Travel App Ultra v15</title>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
         :root {
-            /* 預設模糊度改細了 */
             --bg-blur: 5px; 
-            --bg-glass: rgba(255, 255, 255, 0.70);
+            --bg-glass: rgba(255, 255, 255, 0.75);
             --glass-filter: saturate(180%) blur(20px);
             --theme-color: #007aff;
-            --radius: 24px;
+            --radius: 20px;
             --text-main: #1c1c1e;
             --danger: #ff3b30;
         }
@@ -27,7 +26,6 @@
             min-height: 100vh;
         }
 
-        /* 背景圖偽元素 (控制模糊) */
         body::before {
             content: "";
             position: fixed;
@@ -35,21 +33,19 @@
             background-image: var(--bg-image, url('https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=1000'));
             background-size: cover; 
             background-position: center; 
-            /* 使用變數控制模糊 */
             filter: blur(var(--bg-blur)); -webkit-filter: blur(var(--bg-blur));
-            transform: scale(1.05); /* 輕微放大防止白邊 */
+            transform: scale(1.05);
             z-index: -1;
-            transition: filter 0.2s ease; /* 調整時有順滑動畫 */
+            transition: filter 0.2s ease;
         }
 
-        /* --- 玻璃卡片 --- */
         .glass-card {
             background: var(--bg-glass); 
             backdrop-filter: var(--glass-filter); -webkit-backdrop-filter: var(--glass-filter);
             border-radius: var(--radius);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             margin-bottom: 16px; padding: 20px;
-            border: 1px solid rgba(255,255,255,0.3);
+            border: 1px solid rgba(255,255,255,0.4);
         }
 
         .header-area { padding: 50px 20px 10px 20px; display: flex; flex-direction: column; align-items: flex-start;}
@@ -58,19 +54,15 @@
             text-shadow: 0 2px 10px rgba(255,255,255,0.8); cursor: pointer;
             border-bottom: 2px solid transparent; transition: 0.2s;
         }
-        .app-title:active { opacity: 0.6; border-bottom-color: var(--theme-color); }
         
         .currency-pill { 
-            background: rgba(0,0,0,0.6); color: white; padding: 6px 14px; 
-            border-radius: 20px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;
-            backdrop-filter: blur(5px); cursor: pointer; border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.8); color: #333; padding: 8px 16px; 
+            border-radius: 20px; font-size: 14px; display: inline-flex; align-items: center; gap: 6px;
+            backdrop-filter: blur(10px); cursor: pointer; border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); font-weight: 600;
         }
 
-        /* --- 日子導覽 --- */
-        .day-nav {
-            display: flex; overflow-x: auto; gap: 10px; padding: 10px 20px;
-            scrollbar-width: none;
-        }
+        .day-nav { display: flex; overflow-x: auto; gap: 10px; padding: 10px 20px; scrollbar-width: none; }
         .day-nav::-webkit-scrollbar { display: none; }
         .day-btn {
             min-width: 65px; height: 75px;
@@ -86,7 +78,6 @@
         .day-btn.add-day-btn { color: var(--theme-color); font-size: 24px; }
         .day-week { font-size: 10px; opacity: 0.8; margin-top: 2px; text-transform: uppercase; }
         
-        /* --- 航班卡片 --- */
         .flight-card {
             background: var(--bg-glass);
             backdrop-filter: var(--glass-filter); -webkit-backdrop-filter: var(--glass-filter);
@@ -95,47 +86,45 @@
             border: 2px solid var(--theme-color); 
             color: var(--text-main);
         }
-        .flight-tag { 
-            font-size: 10px; background: var(--theme-color); color: white;
-            padding: 3px 8px; border-radius: 6px; display: inline-block; margin-bottom: 10px; 
-        }
+        .flight-tag { font-size: 10px; background: var(--theme-color); color: white; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-bottom: 10px; }
         .flight-route { display: flex; justify-content: space-between; align-items: center; margin: 15px 0; }
         .route-code { font-size: 36px; font-weight: 800; color: var(--theme-color); }
         .flight-meta { display: flex; justify-content: space-between; font-size: 13px; opacity: 0.8; margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 10px; }
         .flight-note { font-size: 12px; background: rgba(0,0,0,0.05); padding: 5px 10px; border-radius: 8px; margin-top: 10px; display: inline-block;}
         .edit-icon { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.05); color: var(--text-main); padding: 6px; border-radius: 50%; cursor: pointer; }
 
-        /* --- 地圖卡片 --- */
+        /* --- 地圖/行程卡片 --- */
         .map-card-item {
             background: white; border-radius: 16px; padding: 15px; margin-bottom: 10px;
             display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer;
         }
+        .map-click-area { flex: 1; display: flex; align-items: center; }
         .map-info h4 { margin: 0 0 4px 0; font-size: 16px; color: var(--text-main); }
         .map-info p { margin: 0; font-size: 12px; color: #888; }
-        .map-icon-box { 
-            width: 40px; height: 40px; background: #f2f2f7; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center; color: var(--theme-color); margin-right: 15px;
-        }
+        .map-icon-box { width: 40px; height: 40px; background: #f2f2f7; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--theme-color); margin-right: 15px; }
+        .map-actions { display: flex; align-items: center; gap: 8px; }
+        .action-icon { width: 36px; height: 36px; border-radius: 50%; background: #f2f2f7; display: flex; align-items: center; justify-content: center; color: var(--theme-color); cursor: pointer; transition: 0.2s; }
+        .action-icon:active { transform: scale(0.9); }
+        .action-icon.link { background: #e8f0fe; color: #007aff; }
 
-        /* --- 列表 --- */
-        .timeline-item { display: flex; gap: 15px; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .time-col { font-weight: 700; color: var(--theme-color); width: 45px; flex-shrink: 0; font-size: 15px; padding-top: 2px;}
-        .info-col { flex: 1; }
-        .info-title { font-weight: 600; font-size: 16px; margin-bottom: 4px; }
-        .info-sub { font-size: 13px; color: #666; }
+        .timeline-item { display: flex; gap: 12px; padding: 15px 0; border-bottom: 1px solid rgba(0,0,0,0.05); align-items: center; }
+        .time-col { font-weight: 700; color: var(--theme-color); width: 50px; flex-shrink: 0; font-size: 16px; }
+        .info-col { flex: 1; cursor: pointer; }
+        .info-title { font-weight: 700; font-size: 17px; margin-bottom: 4px; color: var(--text-main); }
+        .info-sub { font-size: 13px; color: #666; display: flex; align-items: center; gap: 4px;}
+        .action-area { display: flex; gap: 8px; }
+        .sm-btn { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.2s; background: rgba(0,0,0,0.03); }
+        .sm-btn-link { background: #e8f0fe; color: #007aff; }
+        .sm-btn-del { color: var(--danger); opacity: 0.6; }
 
         .check-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .check-circle { 
-            width: 22px; height: 22px; border-radius: 50%; border: 2px solid #ccc; margin-right: 12px;
-            display: flex; align-items: center; justify-content: center; transition: 0.2s; cursor: pointer;
-        }
+        .check-circle { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #ccc; margin-right: 12px; display: flex; align-items: center; justify-content: center; transition: 0.2s; cursor: pointer; }
         .check-item.done .check-circle { background: var(--theme-color); border-color: var(--theme-color); }
         .check-item.done .check-circle::after { content: '✓'; color: white; font-size: 14px; }
         .check-item.done span { text-decoration: line-through; opacity: 0.5; }
         .trash-btn { margin-left: auto; color: var(--danger); opacity: 0.6; padding: 5px; cursor: pointer;}
 
-        /* --- 底部導覽 --- */
         .bottom-bar {
             position: fixed; bottom: 20px; left: 20px; right: 20px;
             background: rgba(30, 30, 30, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -144,17 +133,13 @@
         }
         .nav-item { color: rgba(255,255,255,0.5); font-size: 24px; transition: 0.2s; position: relative; cursor: pointer; }
         .nav-item.active { color: white; transform: translateY(-2px); }
-        .nav-item.active::after { 
-            content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
-            width: 4px; height: 4px; background: white; border-radius: 50%;
-        }
+        .nav-item.active::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: white; border-radius: 50%; }
         .fab-btn {
             background: var(--theme-color); color: white; border-radius: 50%; width: 45px; height: 45px; 
             display: flex; align-items: center; justify-content: center; transform: translateY(-8px); 
             box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer;
         }
 
-        /* --- 彈窗 --- */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px);
             z-index: 2000; display: none; align-items: center; justify-content: center;
@@ -173,12 +158,17 @@
         .btn-orange { background: #ff9500; color: white; }
         .btn-red { background: var(--danger); color: white; }
 
-        /* --- UI 元件 --- */
-        .converter-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; gap: 10px; }
-        .currency-select { padding: 10px; border-radius: 10px; border: 1px solid #ddd; background: #f9f9f9; font-weight: bold; width: 80px;}
-        .currency-arrow { color: #888; }
-        .rate-display { text-align: center; margin: 20px 0; font-size: 24px; font-weight: 800; color: var(--theme-color); }
-        .rate-sub { text-align: center; font-size: 12px; color: #888; margin-top: -15px; margin-bottom: 15px; }
+        /* --- 匯率計算機 UI --- */
+        .calc-box { text-align: center; }
+        .calc-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; background: #f5f5f5; padding: 10px; border-radius: 16px;}
+        .calc-input { 
+            width: 100%; font-size: 24px; font-weight: bold; border: none; text-align: right; 
+            padding-right: 10px; color: #333; background: transparent;
+        }
+        .calc-input:focus { outline: none; }
+        .currency-select { padding: 8px; border-radius: 10px; border: none; background: #e0e0e0; font-weight: bold; font-size: 16px;}
+        .calc-icon-btn { font-size: 24px; color: var(--theme-color); cursor: pointer; padding: 10px; }
+        .rate-hint { font-size: 12px; color: #999; margin-top: 15px; }
 
         .code-box {
             width: 100%; height: 100px; padding: 10px; border-radius: 12px; border: 1px solid #eee; 
@@ -186,7 +176,6 @@
             box-sizing: border-box; resize: none; word-break: break-all;
         }
 
-        /* 頁面切換 */
         .page { display: none; padding: 0 20px; animation: fade 0.3s; }
         .page.active { display: block; }
         @keyframes fade { from{opacity:0;} to{opacity:1;} }
@@ -194,8 +183,6 @@
         .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee; }
         select.lang-select { padding: 8px; border-radius: 8px; border: 1px solid #ddd; }
         input[type="color"] { border: none; width: 30px; height: 30px; padding: 0; border-radius: 50%; overflow: hidden; cursor: pointer; }
-        
-        /* 模糊度拉桿 */
         input[type="range"] { -webkit-appearance: none; width: 100px; height: 5px; background: #ddd; border-radius: 5px; outline: none; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 15px; height: 15px; border-radius: 50%; background: var(--theme-color); cursor: pointer; }
     </style>
@@ -205,8 +192,8 @@
     <div class="header-area">
         <div class="app-title" id="lbl-app-title" onclick="editAppTitle()">My Trip</div>
         <div class="currency-pill" onclick="openConverter()">
-            <i class="ri-exchange-dollar-line"></i>
-            <span id="lbl-rate-display">--</span>
+            <i class="ri-calculator-line"></i>
+            <span id="lbl-rate-pill">匯率計算</span>
         </div>
     </div>
 
@@ -221,12 +208,11 @@
 
     <div id="pg-map" class="page">
         <div class="glass-card">
-            <h3 id="lbl-map-title">我的地圖</h3>
+            <h3 id="lbl-map-title">我的景點</h3>
+            <p style="font-size:12px; color:#888; margin-bottom:15px; background:#f5f5f5; padding:8px; border-radius:8px;">
+                <i class="ri-information-line"></i> 這裡會自動顯示行程表中的所有地點。
+            </p>
             <div id="map-list-container"></div>
-            <div style="text-align:center; padding:20px; color:#666; font-size:12px; cursor:pointer;" onclick="handleFabClick()">
-                <i class="ri-add-circle-line" style="font-size:20px; vertical-align:middle;"></i>
-                <span id="lbl-add-map">新增地點</span>
-            </div>
         </div>
     </div>
 
@@ -314,17 +300,40 @@
     </div>
 
     <div class="modal-overlay" id="modal-converter">
-        <div class="modal-box">
-            <h3>匯率轉換</h3>
-            <div class="converter-row">
-                <select id="conv-from" class="currency-select" onchange="updateRate()"><option value="HKD">HKD</option><option value="JPY">JPY</option><option value="USD">USD</option><option value="TWD">TWD</option><option value="EUR">EUR</option></select>
-                <i class="ri-arrow-right-line currency-arrow"></i>
-                <select id="conv-to" class="currency-select" onchange="updateRate()"><option value="JPY">JPY</option><option value="HKD">HKD</option><option value="USD">USD</option><option value="TWD">TWD</option><option value="EUR">EUR</option></select>
+        <div class="modal-box calc-box">
+            <h3 style="margin-top:0;">匯率計算機</h3>
+            
+            <div class="calc-row">
+                <select id="conv-from" class="currency-select" onchange="calculateCurrency()">
+                    <option value="HKD">HKD</option><option value="JPY">JPY</option><option value="USD">USD</option>
+                    <option value="TWD">TWD</option><option value="EUR">EUR</option>
+                </select>
+                <input type="number" id="calc-input" class="calc-input" value="1000" oninput="calculateCurrency()">
             </div>
-            <div class="rate-display" id="conv-result">--</div>
-            <div class="rate-sub">點擊上方數字可手動修改</div>
-            <div class="inp-group" id="manual-rate-box" style="display:none;"><label class="inp-label">手動匯率</label><input type="number" step="0.0001" id="manual-rate-inp" class="modal-inp"></div>
-            <div class="btn-row"><button class="btn btn-cancel" onclick="closeModal('modal-converter')">關閉</button><button class="btn btn-save" onclick="saveRate()">設定</button></div>
+
+            <div onclick="swapCurrency()" class="calc-icon-btn">
+                <i class="ri-arrow-up-down-line"></i>
+            </div>
+
+            <div class="calc-row" style="background:#e8f0fe;">
+                <select id="conv-to" class="currency-select" onchange="calculateCurrency()" style="background:#fff;">
+                    <option value="JPY">JPY</option><option value="HKD">HKD</option><option value="USD">USD</option>
+                    <option value="TWD">TWD</option><option value="EUR">EUR</option>
+                </select>
+                <div id="calc-output" class="calc-input" style="color:var(--theme-color);">--</div>
+            </div>
+
+            <div class="rate-hint" onclick="toggleRateEdit()">
+                匯率: <span id="current-rate-display">--</span> (點擊修改)
+            </div>
+            <div id="rate-edit-box" style="display:none; margin-top:10px;">
+                <input type="number" id="manual-rate-inp" placeholder="手動匯率" style="padding:8px; width:80px; border:1px solid #ddd; border-radius:8px;">
+                <button class="btn btn-green" style="padding:8px 12px; width:auto; font-size:12px;" onclick="saveManualRate()">確認</button>
+            </div>
+
+            <div class="btn-row" style="margin-top:20px;">
+                <button class="btn btn-cancel" onclick="closeModal('modal-converter')">關閉</button>
+            </div>
         </div>
     </div>
 
@@ -350,8 +359,9 @@
                 bg: "更換背景", reset: "重置資料", hintAdd: "按中間 + 號新增",
                 save: "儲存", cancel: "取消", day: "Day", addDay: "加一日",
                 weekdays: ["週日", "週一", "週二", "週三", "週四", "週五", "週六"],
-                shopTitle: "購物清單", mapTitle: "我的地圖", addMap: "新增地點",
-                itemPlace: "項目名稱", locName: "地點名稱", locTime: "時間 (選填)",
+                shopTitle: "購物清單", mapTitle: "我的景點", addMap: "新增景點",
+                itemPlace: "項目名稱", locName: "景點名稱", locTime: "時間 (選填)",
+                urlPlace: "網址 (URL, 選填)",
                 copy: "複製代碼", import: "匯入", importDesc: "警告：匯入將會覆蓋現有資料！", exportDesc: "複製此代碼並傳送給朋友",
                 successImport: "匯入成功！", invalidCode: "無效的代碼",
                 delDay: "刪除目前日子", confirmDelDay: "確定要刪除這一天 (Day {0}) 及其所有行程嗎？此動作無法復原。"
@@ -363,8 +373,9 @@
                 bg: "Change Background", reset: "Reset Data", hintAdd: "Press + to add",
                 save: "Save", cancel: "Cancel", day: "Day", addDay: "Add Day",
                 weekdays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-                shopTitle: "Shopping List", mapTitle: "My Maps", addMap: "Add Location",
-                itemPlace: "Item Name", locName: "Location Name", locTime: "Time (Optional)",
+                shopTitle: "Shopping List", mapTitle: "My Spots", addMap: "Add Spot",
+                itemPlace: "Item Name", locName: "Spot Name", locTime: "Time (Optional)",
+                urlPlace: "URL (Optional)",
                 copy: "Copy Code", import: "Import", importDesc: "Warning: Import will overwrite current data!", exportDesc: "Copy and send this code to friend",
                 successImport: "Success!", invalidCode: "Invalid Code",
                 delDay: "Delete Current Day", confirmDelDay: "Delete Day {0} and all its events? This cannot be undone."
@@ -376,8 +387,9 @@
                 bg: "背景変更", reset: "リセット", hintAdd: "+ ボタンで追加",
                 save: "保存", cancel: "キャンセル", day: "Day", addDay: "追加",
                 weekdays: ["日", "月", "火", "水", "木", "金", "土"],
-                shopTitle: "買い物リスト", mapTitle: "マイマップ", addMap: "場所を追加",
-                itemPlace: "アイテム名", locName: "場所名", locTime: "時間 (任意)",
+                shopTitle: "買い物リスト", mapTitle: "スポット", addMap: "スポット追加",
+                itemPlace: "アイテム名", locName: "スポット名", locTime: "時間 (任意)",
+                urlPlace: "URL (任意)",
                 copy: "コピー", import: "インポート", importDesc: "注意：現在のデータは上書きされます", exportDesc: "コードをコピーして友達に送る",
                 successImport: "成功！", invalidCode: "無効なコード",
                 delDay: "この日を削除", confirmDelDay: "Day {0} を削除しますか？"
@@ -392,24 +404,37 @@
             lang: 'zh',
             startDate: '2025-12-27',
             themeColor: '#007aff',
-            blurLevel: 5, // 預設模糊度
+            blurLevel: 5,
             currentDayIdx: 0,
             currency: { from: 'HKD', to: 'JPY', rate: 19.5 }, 
             outboundFlight: { code: 'CX500', from: 'HKG', to: 'TYO', time: '09:05', note: 'T1' },
             inboundFlight: { code: 'CX501', from: 'TYO', to: 'HKG', time: '18:30', note: '' },
             shopList: [{ id: 1, text: "EVE 止痛藥", done: false }],
-            mapList: [],
+            // mapList 移除，改為動態產生
             days: [[], [], [], []] 
         };
 
         let currentPage = 'trip';
 
         // ============================================
-        // 3. 邏輯與初始化
+        // 3. 邏輯與初始化 (加入自動資料遷移)
         // ============================================
         function init() {
-            const saved = localStorage.getItem('ultraTripData_v10'); // v10
+            // 1. 嘗試讀取最新版 (v15)
+            let saved = localStorage.getItem('ultraTripData_v15');
+            
+            // 2. 如果 v15 無資料，自動搜尋舊版資料 (v14, v13, v12, v11, v10)
+            // 這樣你更新後，舊的行程和日期就會自動帶過來，不會遺失！
+            if (!saved) {
+                saved = localStorage.getItem('ultraTripData_v14') || 
+                        localStorage.getItem('ultraTripData_v13') || 
+                        localStorage.getItem('ultraTripData_v12') ||
+                        localStorage.getItem('ultraTripData_v11') ||
+                        localStorage.getItem('ultraTripData_v10');
+            }
+
             if (saved) {
+                // 合併新舊資料結構
                 appData = { ...appData, ...JSON.parse(saved) };
             }
             
@@ -428,10 +453,9 @@
         }
 
         function save() {
-            localStorage.setItem('ultraTripData_v10', JSON.stringify(appData));
+            localStorage.setItem('ultraTripData_v15', JSON.stringify(appData));
         }
 
-        // --- 外觀設定 ---
         function changeTheme(color) {
             appData.themeColor = color;
             applyTheme(color);
@@ -441,7 +465,6 @@
             document.documentElement.style.setProperty('--theme-color', color);
         }
 
-        // --- 模糊度控制 (New) ---
         function changeBlur(val) {
             appData.blurLevel = val;
             applyBlur(val);
@@ -451,73 +474,74 @@
             document.documentElement.style.setProperty('--bg-blur', val + 'px');
         }
 
-        // --- 刪除日子 (New) ---
         function deleteCurrentDay() {
             const idx = appData.currentDayIdx;
-            // 至少保留一天
-            if (appData.days.length <= 1) {
-                alert("至少需要保留一天！");
-                return;
-            }
-
+            if (appData.days.length <= 1) { alert("至少需要保留一天！"); return; }
             const txt = i18n[appData.lang];
             const confirmMsg = txt.confirmDelDay.replace("{0}", idx + 1);
-
             if (confirm(confirmMsg)) {
-                // 刪除該日
                 appData.days.splice(idx, 1);
-                // 調整索引，避免超出範圍
                 if (appData.currentDayIdx >= appData.days.length) {
                     appData.currentDayIdx = appData.days.length - 1;
                 }
-                save();
-                renderUI();
-                alert("已刪除 Day " + (idx + 1));
+                save(); renderUI(); alert("已刪除 Day " + (idx + 1));
             }
         }
 
-        // --- 匯率 ---
+        // --- 匯率計算機 (升級版) ---
         function openConverter() {
             const modal = document.getElementById('modal-converter');
             document.getElementById('conv-from').value = appData.currency.from;
             document.getElementById('conv-to').value = appData.currency.to;
-            updateRateDisplay(appData.currency.rate);
+            // 嘗試自動更新匯率，然後計算
+            fetchRate().then(() => { calculateCurrency(); });
             modal.classList.add('show');
-            updateRate(); 
         }
 
-        async function updateRate() {
+        async function fetchRate() {
             const from = document.getElementById('conv-from').value;
             const to = document.getElementById('conv-to').value;
-            const display = document.getElementById('conv-result');
-            display.style.opacity = 0.5;
             try {
                 const res = await fetch(`https://open.er-api.com/v6/latest/${from}`);
                 const data = await res.json();
                 const rate = data.rates[to];
-                if(rate) updateRateDisplay(rate);
-            } catch (e) {}
-            display.style.opacity = 1;
+                if(rate) { appData.currency.rate = rate; save(); }
+            } catch (e) { console.log("Offline"); }
         }
 
-        function updateRateDisplay(rate) {
-            const r = parseFloat(rate);
-            const val = r > 10 ? r.toFixed(2) : r.toFixed(4);
-            document.getElementById('conv-result').innerText = `1 ${document.getElementById('conv-from').value} ≈ ${val} ${document.getElementById('conv-to').value}`;
-            document.getElementById('manual-rate-inp').value = r;
-        }
-
-        document.getElementById('conv-result').onclick = function() {
-            document.getElementById('manual-rate-box').style.display = 'block';
-        };
-
-        function saveRate() {
+        function calculateCurrency() {
+            const amount = parseFloat(document.getElementById('calc-input').value) || 0;
+            const rate = appData.currency.rate;
+            const result = (amount * rate).toFixed(2);
+            document.getElementById('calc-output').innerText = result;
+            document.getElementById('current-rate-display').innerText = `1 ${document.getElementById('conv-from').value} = ${rate.toFixed(4)} ${document.getElementById('conv-to').value}`;
+            
             appData.currency.from = document.getElementById('conv-from').value;
             appData.currency.to = document.getElementById('conv-to').value;
-            const manual = document.getElementById('manual-rate-inp').value;
-            appData.currency.rate = parseFloat(manual);
-            save(); renderCurrency(); closeModal('modal-converter');
-            document.getElementById('manual-rate-box').style.display = 'none';
+            save();
+        }
+
+        // 新增：互換貨幣功能
+        function swapCurrency() {
+            const from = document.getElementById('conv-from').value;
+            const to = document.getElementById('conv-to').value;
+            document.getElementById('conv-from').value = to;
+            document.getElementById('conv-to').value = from;
+            fetchRate().then(() => { calculateCurrency(); });
+        }
+
+        function toggleRateEdit() {
+            const box = document.getElementById('rate-edit-box');
+            box.style.display = box.style.display === 'none' ? 'block' : 'none';
+            document.getElementById('manual-rate-inp').value = appData.currency.rate;
+        }
+
+        function saveManualRate() {
+            const val = parseFloat(document.getElementById('manual-rate-inp').value);
+            if(val) {
+                appData.currency.rate = val; save(); calculateCurrency();
+                document.getElementById('rate-edit-box').style.display = 'none';
+            }
         }
 
         // --- 標題與分享 ---
@@ -530,11 +554,7 @@
                 </div>
             `, () => {
                 const newVal = document.getElementById('edit-title-inp').value;
-                if(newVal) {
-                    appData.customTitle = newVal;
-                    applyLang(); 
-                    save();
-                }
+                if(newVal) { appData.customTitle = newVal; applyLang(); save(); }
             });
         }
 
@@ -570,36 +590,71 @@
                 try {
                     const json = decodeURIComponent(escape(atob(code)));
                     const newData = JSON.parse(json);
-                    if(confirm("確定匯入？")) {
-                        appData = newData; save(); init(); closeModal('modal-share'); alert(i18n[appData.lang].successImport);
-                    }
+                    if(confirm("確定匯入？")) { appData = newData; save(); init(); closeModal('modal-share'); alert(i18n[appData.lang].successImport); }
                 } catch(e) { alert(i18n[appData.lang].invalidCode); }
             };
             modal.classList.add('show');
         }
 
-        // --- 渲染 ---
+        // --- 核心：安全開啟連結 ---
+        function safeOpen(url) {
+            if(!url) return;
+            if (!url.match(/^https?:\/\//i)) url = 'https://' + url;
+            window.open(url, '_blank');
+        }
+
+        function openMap(name) {
+            // 使用 Google Maps 官方標準搜尋 URL，解決 404 問題
+            const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`;
+            window.open(url, '_blank');
+        }
+
+        // --- 核心：地圖列表自動同步 (Sync) ---
         function renderMapList() {
             const list = document.getElementById('map-list-container'); list.innerHTML = '';
-            if(appData.mapList.length === 0) { list.innerHTML = `<div style="text-align:center; opacity:0.5; padding:20px;">尚無地點</div>`; return; }
-            appData.mapList.forEach((item, idx) => {
+            
+            let allSpots = [];
+            appData.days.forEach((day, dayIdx) => {
+                day.forEach((event, eventIdx) => { 
+                    allSpots.push({ ...event, dayIdx: dayIdx, eventIdx: eventIdx }); 
+                });
+            });
+
+            if(allSpots.length === 0) { list.innerHTML = `<div style="text-align:center; opacity:0.5; padding:20px;">尚無行程</div>`; return; }
+            
+            allSpots.forEach((item) => {
                 const div = document.createElement('div'); div.className = 'map-card-item';
-                div.onclick = (e) => {
-                    if(e.target.classList.contains('ri-delete-bin-line')) return;
-                    window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.name)}`);
-                };
-                div.innerHTML = `<div style="display:flex; align-items:center;"><div class="map-icon-box"><i class="ri-map-pin-2-fill"></i></div><div class="map-info"><h4>${item.name}</h4><p>${item.time ? item.time + ' • ' : ''}${item.note || ''}</p></div></div><i class="ri-delete-bin-line trash-btn" onclick="delMap(${idx})"></i>`;
+                
+                let urlBtnHtml = '';
+                if(item.url && item.url.trim() !== "") {
+                    urlBtnHtml = `<div class="action-icon link" onclick="safeOpen('${item.url}')"><i class="ri-global-line"></i></div>`;
+                }
+
+                div.innerHTML = `
+                    <div class="map-click-area" onclick="openMap('${item.title}')">
+                        <div class="map-icon-box"><i class="ri-map-pin-2-fill"></i></div>
+                        <div class="map-info">
+                            <h4>${item.title}</h4>
+                            <p>Day ${item.dayIdx + 1} • ${item.time}</p>
+                        </div>
+                    </div>
+                    <div class="map-actions">
+                        ${urlBtnHtml}
+                        <div class="action-icon" style="color:var(--danger);" onclick="deleteFromMap(${item.dayIdx}, ${item.eventIdx})"><i class="ri-delete-bin-line"></i></div>
+                    </div>
+                `;
                 list.appendChild(div);
             });
         }
-        function delMap(idx) { if(confirm('刪除？')) { appData.mapList.splice(idx, 1); renderMapList(); save(); } }
 
-        function renderUI() { renderCurrency(); renderDayNav(); renderTripList(); renderShopList(); renderMapList(); }
-
-        function renderCurrency() {
-            const { from, to, rate } = appData.currency;
-            document.getElementById('lbl-rate-display').innerText = `1 ${from} ≈ ${rate} ${to}`;
+        function deleteFromMap(dayIdx, eventIdx) {
+            if(confirm('刪除此行程？')) {
+                appData.days[dayIdx].splice(eventIdx, 1);
+                save(); renderUI();
+            }
         }
+
+        function renderUI() { renderDayNav(); renderTripList(); renderShopList(); renderMapList(); }
         
         function getDateInfo(dayIndex) {
             const date = new Date(appData.startDate);
@@ -643,8 +698,24 @@
             if(events.length > 0) {
                 const card = document.createElement('div'); card.className = 'glass-card';
                 events.sort((a,b)=>a.time.localeCompare(b.time));
-                let h=''; events.forEach((ev,i)=>{
-                    h+=`<div class="timeline-item"><div class="time-col">${ev.time}</div><div class="info-col"><div class="info-title">${ev.title}</div><div class="info-sub">${ev.sub}</div></div><i class="ri-close-circle-line" style="color:var(--danger);opacity:0.3;cursor:pointer;" onclick="delEvent(${i})"></i></div>`;
+                let h=''; 
+                events.forEach((ev,i)=>{
+                    let urlBtn = '';
+                    if(ev.url && ev.url.trim() !== "") {
+                        urlBtn = `<div class="sm-btn sm-btn-link" onclick="safeOpen('${ev.url}')"><i class="ri-global-line"></i></div>`;
+                    }
+                    h+=`
+                    <div class="timeline-item">
+                        <div class="time-col">${ev.time}</div>
+                        <div class="info-col" onclick="openMap('${ev.title}')">
+                            <div class="info-title">${ev.title}</div>
+                            <div class="info-sub"><i class="ri-sticky-note-line"></i> ${ev.sub}</div>
+                        </div>
+                        <div class="action-area">
+                            ${urlBtn}
+                            <div class="sm-btn sm-btn-del" onclick="delEvent(${i})"><i class="ri-delete-bin-line"></i></div>
+                        </div>
+                    </div>`;
                 });
                 card.innerHTML=h; list.appendChild(card);
             } else if(!isFirst && !isLast) { list.innerHTML+=`<div style="text-align:center;padding:30px;opacity:0.5;">No Events</div>`; }
@@ -665,27 +736,31 @@
             return `<div class="flight-card"><div class="edit-icon" onclick="editFlight('${t}')"><i class="ri-pencil-line"></i></div><span class="flight-tag">${l}</span><div class="flight-route"><span class="route-code">${f.from}</span><i class="ri-plane-fill" style="font-size:24px;opacity:0.6;"></i><span class="route-code">${f.to}</span></div><div class="flight-meta"><span><i class="ri-time-line"></i> ${f.time}</span><span>${f.code}</span></div>${f.note?`<div class="flight-note">${f.note}</div>`:''}</div>`;
         }
 
-        // --- 互動邏輯 ---
         function handleFabClick() {
             const txt = i18n[appData.lang];
-            if(currentPage === 'trip') {
-                openModal(`<div class="inp-group"><label class="inp-label">Time</label><input type="time" id="e-time" class="modal-inp" value="12:00"></div><div class="inp-group"><label class="inp-label">Title</label><input id="e-title" class="modal-inp"></div><div class="inp-group"><label class="inp-label">Note</label><input id="e-sub" class="modal-inp"></div>`, ()=>{
-                    appData.days[appData.currentDayIdx].push({time:document.getElementById('e-time').value, title:document.getElementById('e-title').value, sub:document.getElementById('e-sub').value});
+            // 行程 & 地圖都用同一個新增入口
+            if(currentPage === 'trip' || currentPage === 'map') {
+                openModal(`
+                    <div class="inp-group"><label class="inp-label">${txt.locTime}</label><input type="time" id="e-time" class="modal-inp" value="12:00"></div>
+                    <div class="inp-group"><label class="inp-label">${txt.itemPlace} (地點)</label><input id="e-title" class="modal-inp" placeholder="例如: 清水寺"></div>
+                    <div class="inp-group"><label class="inp-label">${txt.urlPlace}</label><input id="e-url" class="modal-inp" placeholder="https://..."></div>
+                    <div class="inp-group"><label class="inp-label">${txt.note}</label><input id="e-sub" class="modal-inp" placeholder="備註"></div>
+                `, ()=>{
+                    appData.days[appData.currentDayIdx].push({
+                        time:document.getElementById('e-time').value, 
+                        title:document.getElementById('e-title').value, 
+                        url:document.getElementById('e-url').value,
+                        sub:document.getElementById('e-sub').value
+                    });
                     save(); renderUI();
                 });
             } else if(currentPage === 'shop') {
                 openModal(`<div class="inp-group"><label class="inp-label">${txt.itemPlace}</label><input id="s-name" class="modal-inp"></div>`, ()=>{
                     const v=document.getElementById('s-name').value; if(v){appData.shopList.push({id:Date.now(), text:v, done:false}); save(); renderUI();}
                 });
-            } else if(currentPage === 'map') {
-                openModal(`<div class="inp-group"><label class="inp-label">${txt.locName} (必填)</label><input id="m-name" class="modal-inp" placeholder="例如: 東京鐵塔"></div><div class="inp-group"><label class="inp-label">${txt.locTime}</label><input type="time" id="m-time" class="modal-inp"></div><div class="inp-group"><label class="inp-label">${txt.note}</label><input id="m-note" class="modal-inp"></div>`, () => {
-                    const name = document.getElementById('m-name').value;
-                    if(name) { appData.mapList.push({ name: name, time: document.getElementById('m-time').value, note: document.getElementById('m-note').value }); save(); renderUI(); }
-                });
             }
         }
 
-        // --- 通用 ---
         function changeLang(){ appData.lang=document.getElementById('sel-lang').value; applyLang(); renderUI(); save(); }
         function applyLang(){
             const t=i18n[appData.lang];
@@ -712,7 +787,7 @@
         
         function triggerBgUpload(){document.getElementById('bg-upload').click();}
         document.getElementById('bg-upload').onchange=(e)=>{const f=e.target.files[0];if(f){const r=new FileReader();r.onload=(v)=>{document.documentElement.style.setProperty('--bg-image', `url(${v.target.result})`); try{localStorage.setItem('ultraBg',v.target.result);}catch(e){}};r.readAsDataURL(f);}};
-        function resetApp(){if(confirm('Reset?')){localStorage.removeItem('ultraTripData_v10');location.reload();}}
+        function resetApp(){if(confirm('Reset?')){localStorage.removeItem('ultraTripData_v15');location.reload();}}
         function switchPage(pid,btn){currentPage=pid;document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('pg-'+pid).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));if(btn)btn.classList.add('active');
             if(pid==='map') document.getElementById('day-nav-container').style.display='none';
             else if(pid==='trip') document.getElementById('day-nav-container').style.display='flex';
