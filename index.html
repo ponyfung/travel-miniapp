@@ -408,10 +408,18 @@
         // ============================================
         // 2. 核心資料
         // ============================================
+        
+        // 取得今日日期 (格式 YYYY-MM-DD)
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const todayStr = `${yyyy}-${mm}-${dd}`;
+
         let appData = {
             customTitle: "", 
             lang: 'zh',
-            startDate: '2025-12-27',
+            startDate: todayStr, // 修改：預設使用「今日」
             themeColor: '#007aff',
             blurLevel: 5,
             currentDayIdx: 0,
@@ -419,8 +427,9 @@
             outboundFlight: { code: 'CX500', from: 'HKG', to: 'TYO', time: '09:05', note: 'T1' },
             inboundFlight: { code: 'CX501', from: 'TYO', to: 'HKG', time: '18:30', note: '' },
             shopList: [{ id: 1, text: "EVE 止痛藥", done: false }],
-            // mapList 移除，改為動態產生
-            days: [[], [], [], []] 
+            mapList: [],
+            // 修改：只預設 1 日 (解決一下子出4日的問題)
+            days: [[]] 
         };
 
         let currentPage = 'trip';
@@ -429,69 +438,37 @@
         // 3. 邏輯與初始化 (加入自動遷移)
         // ============================================
         function init() {
-            // 嘗試讀取最新版 (v14)
-            let saved = localStorage.getItem('ultraTripData_v14_fixed');
+            // 只讀取最新版 v14 的資料，不讀取舊版
+            const saved = localStorage.getItem('ultraTripData_v14_fixed'); 
             
-            // 如果 v14 無資料，嘗試從舊資料遷移 (Migration)
-            if (!saved) {
-                saved = localStorage.getItem('ultraTripData_v13') || 
-                        localStorage.getItem('ultraTripData_v12') ||
-                        localStorage.getItem('ultraTripData_v11') ||
-                        localStorage.getItem('ultraTripData_v10');
-            }
-
             if (saved) {
+                // 如果有儲存過的資料，就用儲存的
                 appData = { ...appData, ...JSON.parse(saved) };
+            } else {
+                // 如果是第一次開 App (或者重置後)，確保日期是今天
+                // 這裡再執行一次確保萬無一失
+                const today = new Date();
+                const yyyy = today.getFullYear();
+                const mm = String(today.getMonth() + 1).padStart(2, '0');
+                const dd = String(today.getDate()).padStart(2, '0');
+                appData.startDate = `${yyyy}-${mm}-${dd}`;
             }
             
+            // 讀取背景圖
             const bg = localStorage.getItem('ultraBg');
             if(bg) document.documentElement.style.setProperty('--bg-image', `url(${bg})`);
 
+            // 設定輸入框數值
             document.getElementById('sel-lang').value = appData.lang;
             document.getElementById('inp-start-date').value = appData.startDate;
             document.getElementById('inp-color').value = appData.themeColor;
             document.getElementById('inp-blur').value = appData.blurLevel;
             
+            // 執行渲染
             applyTheme(appData.themeColor);
             applyBlur(appData.blurLevel);
             applyLang();
             renderUI();
-        }
-
-        function save() {
-            localStorage.setItem('ultraTripData_v14_fixed', JSON.stringify(appData));
-        }
-
-        function changeTheme(color) {
-            appData.themeColor = color;
-            applyTheme(color);
-            save(); renderDayNav(); renderTripList();
-        }
-        function applyTheme(color) {
-            document.documentElement.style.setProperty('--theme-color', color);
-        }
-
-        function changeBlur(val) {
-            appData.blurLevel = val;
-            applyBlur(val);
-            save();
-        }
-        function applyBlur(val) {
-            document.documentElement.style.setProperty('--bg-blur', val + 'px');
-        }
-
-        function deleteCurrentDay() {
-            const idx = appData.currentDayIdx;
-            if (appData.days.length <= 1) { alert("至少需要保留一天！"); return; }
-            const txt = i18n[appData.lang];
-            const confirmMsg = txt.confirmDelDay.replace("{0}", idx + 1);
-            if (confirm(confirmMsg)) {
-                appData.days.splice(idx, 1);
-                if (appData.currentDayIdx >= appData.days.length) {
-                    appData.currentDayIdx = appData.days.length - 1;
-                }
-                save(); renderUI(); alert("已刪除 Day " + (idx + 1));
-            }
         }
 
         // --- 匯率計算機 (升級版) ---
